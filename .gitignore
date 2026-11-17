@@ -1,0 +1,28 @@
+# 客户数据 —— 绝对不提交
+data/
+*.db
+*.db-wal
+*.db-shm
+*.xlsx
+
+# 运行时 —— 体积大，用 tools/setup_runtime.py 现场下载
+runtime/
+py.zip
+
+# 缓存与日志
+__pycache__/
+*.pyc
+*.pyo
+*.log
+
+# 构建产物
+shots/
+updates/
+*.bak/
+app.bak/
+tools.bak/
+.DS_Store
+Thumbs.db
+
+# 个人定制脚本（含本机路径与人名），不公开
+tools/make_*.py
