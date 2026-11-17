@@ -200,7 +200,7 @@ function openUpdateDialog() {
         ap.textContent = '正在下载…';
         const p = $('#upd-progress', root);
         p.style.display = '';
-        p.innerHTML = `正在从 GitHub 下载 ${esc(u.latest)} 的安装包，大约 11 MB…`;
+        p.innerHTML = `正在从 GitHub 下载 ${esc(u.latest)} 的安装包…`;
         try {
           const r = await api('/update/apply', { method: 'POST', body: {} });
           if (!r.ok) throw new Error(r.error || '更新失败');
@@ -340,7 +340,7 @@ window.addEventListener('hashchange', () => {
   } catch (e) { console.error(e); }
   if (!location.hash) location.hash = '#/today';
 
-  // 开场片头：首次进入，或使用 ?intro=1 强制预览
+  // 开场片头：每次进入时播放，可在设置中关闭
   if (introWanted() && S.settings.intro_off !== '1') {
     const q = new URLSearchParams(location.hash.split('?')[1] || '');
     playIntro({
@@ -357,11 +357,21 @@ window.addEventListener('hashchange', () => {
   if (qt.get('cmd') === '1') setTimeout(() => openCommand(), 260);
   // 侧边栏的逾期角标：后台补一次，不阻塞首屏
   api('/stats').then((s) => { S.qualityN = s.overdue; updateNav(); }).catch(() => {});
-  // 开屏 4 秒后悄悄查一次新版本，不打扰
+  // 更新窗口等待开场结束，避免被开场遮住。
+  const showUpdateAfterIntro = () => {
+    if (document.querySelector('.intro')) {
+      document.addEventListener('intro:closed', openUpdateDialog, { once: true });
+    } else {
+      openUpdateDialog();
+    }
+  };
   if (qt.get('update') === '1') {
     await checkUpdate(false);
-    setTimeout(openUpdateDialog, 150);
+    showUpdateAfterIntro();
   } else {
-    setTimeout(() => { checkUpdate(); }, 4000);
+    setTimeout(async () => {
+      const result = await checkUpdate();
+      if (result && result.has_update) showUpdateAfterIntro();
+    }, 4000);
   }
 })();

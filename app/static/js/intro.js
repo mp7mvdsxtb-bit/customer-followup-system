@@ -3,22 +3,10 @@
    这样即使某些环境对 CSS 动画支持不好，最终态也一定会出现。 */
 'use strict';
 
-const INTRO_KEY = 'crm-intro-done';
-
 function introWanted() {
-  try {
-    const h = location.hash || '';
-    const q = new URLSearchParams(h.split('?')[1] || '');
-    const v = q.get('intro');
-    if (v === '1' || v === 'still') return true;
-    if (v === '0') return false;
-    return !localStorage.getItem(INTRO_KEY);
-  } catch (e) {
-    return false;
-  }
-}
-function introDone() {
-  try { localStorage.setItem(INTRO_KEY, '1'); } catch (e) {}
+  const h = location.hash || '';
+  const q = new URLSearchParams(h.split('?')[1] || '');
+  return q.get('intro') !== '0';
 }
 
 function playIntro(opts = {}) {
@@ -188,8 +176,10 @@ function playIntro(opts = {}) {
     window.removeEventListener('resize', resize);
     document.removeEventListener('keydown', onKey);
     el.classList.add('out');
-    setTimeout(() => el.remove(), 820);
-    introDone();
+    setTimeout(() => {
+      el.remove();
+      document.dispatchEvent(new CustomEvent('intro:closed'));
+    }, 820);
   }
   function onKey(e) {
     if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
