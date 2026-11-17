@@ -69,53 +69,6 @@ async function viewSettings(main) {
       </div>
 
       <div class="card stat">
-        <h3>开场片头</h3>
-        <div class="row" style="margin-bottom:14px">
-          <label class="switch"><input type="checkbox" id="set-intro-on"
-            ${st.intro_off !== '1' ? 'checked' : ''}> 进入时播放开场</label>
-          <span class="dim" style="font-size:12px">每次打开都会播，点开场右上角「今天不再显示」可当天跳过</span>
-        </div>
-        <div class="field">
-          <label>用哪一个</label>
-          <select class="input" id="set-intro-scene" style="width:100%">
-            <option value="auto" ${(!st.intro_scene || st.intro_scene === 'auto') ? 'selected' : ''}>
-              自动轮换 — 一天一个，10 天一轮</option>
-            ${(window.INTRO_SCENES || []).map((s) => `
-              <option value="${s.no}" ${st.intro_scene === String(s.no) ? 'selected' : ''}>
-                ${s.no}. ${s.label}</option>`).join('')}
-          </select>
-          <div class="dim" style="font-size:12px;margin-top:6px">
-            共 10 个场景，视觉和交互各不相同（点击 / 长按 / 滚轮 / 鼠标跟随）。
-            今天轮到第 <b id="intro-today-no">—</b> 个。
-          </div>
-        </div>
-        <div class="field" style="margin-top:18px">
-          <label>名字（留空则不显示名字）</label>
-          <input class="input" id="set-intro-name" style="width:100%"
-            value="${esc(st.intro_name || '')}" placeholder="例：你的名字">
-        </div>
-        <div class="field">
-          <label>副标题</label>
-          <input class="input" id="set-intro-sub" style="width:100%"
-            value="${esc(st.intro_sub || '欢迎来到你的客户系统')}">
-        </div>
-        <div class="field">
-          <label>下面那行小字</label>
-          <input class="input" id="set-intro-note" style="width:100%"
-            value="${esc(st.intro_note || '这里存着你要打的每一通电话')}">
-        </div>
-        <div class="field">
-          <label>落款（留空则不显示）</label>
-          <input class="input" id="set-intro-sign" style="width:100%"
-            value="${esc(st.intro_sign || '')}" placeholder="例：你的名字">
-        </div>
-        <div class="row">
-          <button class="btn primary" data-save-intro>保存</button>
-          <button class="btn" data-replay-intro>${icon('play', 'sm')} 重播开场</button>
-        </div>
-      </div>
-
-      <div class="card stat">
         <h3>关于</h3>
         <div class="dim" style="font-size:12.5px;line-height:1.85">
           本机运行，数据只存在本机 <span class="mono">data\\crm.db</span>，不上传任何服务器。<br>
@@ -166,39 +119,6 @@ async function viewSettings(main) {
       toast('已备份到 ' + r.path, 'ok');
     } catch (e) { toast(e.message, 'bad'); }
   };
-  /* 开场片头 */
-  const todayNo = $('#intro-today-no', main);
-  if (todayNo && window.INTRO_TODAY) todayNo.textContent = INTRO_TODAY();
-  $('[data-save-intro]', main).onclick = async () => {
-    await api('/settings', {
-      method: 'POST',
-      body: {
-        intro_scene: $('#set-intro-scene', main).value,
-        intro_name: $('#set-intro-name', main).value.trim(),
-        intro_sub: $('#set-intro-sub', main).value.trim(),
-        intro_note: $('#set-intro-note', main).value.trim(),
-        intro_sign: $('#set-intro-sign', main).value.trim(),
-        intro_off: $('#set-intro-on', main).checked ? '0' : '1',
-      },
-    });
-    const nm = $('#set-intro-name', main).value.trim();
-    document.title = nm ? '客户跟进 · ' + nm : '客户跟进';
-    if (window.S && S.settings) {
-      S.settings.intro_scene = $('#set-intro-scene', main).value;
-    }
-    toast('已保存', 'ok');
-  };
-  $('[data-replay-intro]', main).onclick = () => {
-    const pick = $('#set-intro-scene', main).value;
-    playIntro({
-      name: $('#set-intro-name', main).value.trim(),
-      sub: $('#set-intro-sub', main).value.trim() || '欢迎来到你的客户系统',
-      note: $('#set-intro-note', main).value.trim() || '这里存着你要打的每一通电话',
-      sign: $('#set-intro-sign', main).value.trim(),
-      scene: pick === 'auto' ? undefined : pick,
-    });
-  };
-
   const cu = $('[data-check-update]', main);
   if (cu) cu.onclick = async () => {
     cu.disabled = true;
