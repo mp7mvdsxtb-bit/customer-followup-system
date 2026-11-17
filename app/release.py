@@ -5,7 +5,7 @@
 程序靠 Releases 的 tag 判断有没有新版本。
 """
 
-VERSION = "1.4.1"
+VERSION = "1.4.2"
 
 # 本安装专属更新通道；另一个版本使用 no-intro。
 UPDATE_CHANNEL = "with-intro"

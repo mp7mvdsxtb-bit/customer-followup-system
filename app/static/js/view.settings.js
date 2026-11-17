@@ -73,23 +73,27 @@ async function viewSettings(main) {
         <div class="row" style="margin-bottom:14px">
           <label class="switch"><input type="checkbox" id="set-intro-on"
             ${st.intro_off !== '1' ? 'checked' : ''}> 进入时播放开场</label>
-          <span class="dim" style="font-size:12px">每次打开都会播，点开场右上角「今天不再显示」可当天跳过</span>
         </div>
         <div class="field">
-          <label>用哪一个</label>
-          <select class="input" id="set-intro-scene" style="width:100%">
-            <option value="auto" ${(!st.intro_scene || st.intro_scene === 'auto') ? 'selected' : ''}>
-              自动轮换 — 一天一个，10 天一轮</option>
-            ${(window.INTRO_SCENES || []).map((s) => `
-              <option value="${s.no}" ${st.intro_scene === String(s.no) ? 'selected' : ''}>
-                ${s.no}. ${s.label}</option>`).join('')}
-          </select>
-          <div class="dim" style="font-size:12px;margin-top:6px">
-            共 10 个场景，视觉和交互各不相同（点击 / 长按 / 滚轮 / 鼠标跟随）。
-            今天轮到第 <b id="intro-today-no">—</b> 个。
+          <label>开场风格（选择后可重播预览）</label>
+          <div class="row" style="gap:24px 12px;flex-wrap:wrap" id="set-intro-theme">
+            ${[['warm', '信笺', 'linear-gradient(140deg,#fff9fb,#fdeef5,#f6ecfb)'],
+               ['star', '星空', 'radial-gradient(circle at 40% 35%,#2a1f45,#0b0910)'],
+               ['plain', '留白', '#ffffff'],
+               ['garden', '花园', '#d9e8cb'], ['ocean', '海风', '#164e68'],
+               ['cinema', '电影', '#261b1b'], ['ticket', '车票', '#f1a85d'],
+               ['cafe', '咖啡', '#634538'], ['sunrise', '日出', '#f7aa84'],
+               ['arcade', '游戏', '#291b62']].map(([k, l, bg]) => `
+              <button data-t="${k}" class="intro-swatch" title="${l}"
+                style="width:56px;height:36px;border-radius:9px;background:${bg};
+                  border:1px solid var(--border-2);position:relative;
+                  ${(st.intro_theme || 'warm') === k ? 'outline:2px solid var(--brand);outline-offset:2px' : ''}">
+                <span style="position:absolute;left:0;right:0;bottom:-17px;font-size:10.5px;
+                  color:var(--text-3);text-align:center">${l}</span>
+              </button>`).join('')}
           </div>
         </div>
-        <div class="field" style="margin-top:18px">
+        <div class="field" style="margin-top:24px">
           <label>名字（留空则不显示名字）</label>
           <input class="input" id="set-intro-name" style="width:100%"
             value="${esc(st.intro_name || '')}" placeholder="例：你的名字">
@@ -167,13 +171,21 @@ async function viewSettings(main) {
     } catch (e) { toast(e.message, 'bad'); }
   };
   /* 开场片头 */
-  const todayNo = $('#intro-today-no', main);
-  if (todayNo && window.INTRO_TODAY) todayNo.textContent = INTRO_TODAY();
+  let introTheme = st.intro_theme || 'warm';
+  $('#set-intro-theme', main).onclick = (e) => {
+    const b = e.target.closest('[data-t]'); if (!b) return;
+    introTheme = b.dataset.t;
+    $$('#set-intro-theme [data-t]', main).forEach((x) => {
+      x.style.outline = 'none';
+    });
+    b.style.outline = '2px solid var(--brand)';
+    b.style.outlineOffset = '2px';
+  };
   $('[data-save-intro]', main).onclick = async () => {
     await api('/settings', {
       method: 'POST',
       body: {
-        intro_scene: $('#set-intro-scene', main).value,
+        intro_theme: introTheme,
         intro_name: $('#set-intro-name', main).value.trim(),
         intro_sub: $('#set-intro-sub', main).value.trim(),
         intro_note: $('#set-intro-note', main).value.trim(),
@@ -183,19 +195,16 @@ async function viewSettings(main) {
     });
     const nm = $('#set-intro-name', main).value.trim();
     document.title = nm ? '客户跟进 · ' + nm : '客户跟进';
-    if (window.S && S.settings) {
-      S.settings.intro_scene = $('#set-intro-scene', main).value;
-    }
     toast('已保存', 'ok');
   };
   $('[data-replay-intro]', main).onclick = () => {
-    const pick = $('#set-intro-scene', main).value;
+    try { localStorage.removeItem('crm-intro-done'); } catch (e) {}
     playIntro({
+      theme: introTheme,
       name: $('#set-intro-name', main).value.trim(),
       sub: $('#set-intro-sub', main).value.trim() || '欢迎来到你的客户系统',
       note: $('#set-intro-note', main).value.trim() || '这里存着你要打的每一通电话',
       sign: $('#set-intro-sign', main).value.trim(),
-      scene: pick === 'auto' ? undefined : pick,
     });
   };
 
