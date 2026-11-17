@@ -34,9 +34,9 @@
     2: '日子一天天过，还好有你',
     3: '这首歌，单曲循环一整天',
     4: '下雨天，也想听听你的声音',
-    5: '喝完这杯，就去打电话',
-    6: '你是我今晚最亮的一颗',
-    7: '天亮了，又是想你的一天',
+    5: '你慢慢长，我慢慢等',
+    6: '每天这一小时，都留给你',
+    7: '飞得再远，线在我手里',
     8: '愿你今天，事事顺心',
     9: '想到什么，就去做吧',
     10: 'A 面第一首，是给你的',
@@ -268,123 +268,173 @@
   }
 
   /* ============================================================
-     5 · 桌面 —— 掀开便签
+     5 · 绿植 —— 窗台上一盆植物，浇水会长出新叶
      ============================================================ */
-  function sDesk(ctx) {
-    const { root, stage, name, sub, sign, still } = ctx;
+  function sPlant(ctx) {
+    const { root, stage, name, still } = ctx;
+
+    // 叶片位置写死成表：每次长出来都一模一样，不会随机得很乱
+    const LEAVES = [
+      { b: 18, x: -40, rot: -38, s: 0.92, m: 1 },
+      { b: 24, x:  40, rot:  38, s: 0.90, m: 0 },
+      { b: 34, x: -52, rot: -50, s: 0.78, m: 1 },
+      { b: 40, x:  52, rot:  50, s: 0.80, m: 0 },
+      { b: 50, x: -34, rot: -24, s: 0.86, m: 1 },
+      { b: 56, x:  34, rot:  24, s: 0.84, m: 0 },
+      { b: 66, x: -46, rot: -58, s: 0.66, m: 1 },
+      { b: 70, x:  46, rot:  58, s: 0.68, m: 0 },
+      { b: 80, x: -26, rot: -14, s: 0.62, m: 1 },
+      { b: 84, x:  26, rot:  14, s: 0.60, m: 0 },
+    ];
+
+    const leafHtml = LEAVES.map((l, i) => `
+      <div class="leaf${l.m ? ' mirror' : ''}" data-i="${i}"
+        style="left:calc(50% + ${l.x}px);bottom:${l.b}%;
+          scale:${l.s};transform:rotate(${l.rot}deg);
+          ${l.m ? 'transform-origin:100% 100%' : 'transform-origin:0 100%'}"></div>`).join('');
+
     stage.innerHTML = `
-      <div class="table">
-        <div class="pencil"></div>
-        <div class="cup">
-          <div class="steam"></div>
-          <div class="body"><div class="coffee"></div></div>
-          <div class="handle"></div>
+      <div class="scene">
+        <div class="sun"></div>
+        <div class="plant">
+          <div class="stem" style="height:86%"></div>
+          ${leafHtml}
         </div>
-        <div class="note">
-          <div class="who">${esc(name)}</div>
-          <div class="hr"></div>
-          <div class="say">${esc(sub)}</div>
-          <div class="love">${esc(LOVE[5])}</div>
-          <div class="say" style="margin-top:14px;color:#9b8b76;font-size:11.5px">
-            ${sign ? '—— ' + esc(sign) : ''}</div>
+        <div class="pot">
+          <div class="water"></div>
+          <div class="tag">
+            <div class="who">${esc(name)}</div>
+            <div class="love">${esc(LOVE[5])}</div>
+          </div>
+        </div>
+        <div class="hint">点一下浇水</div>
+      </div>`;
+
+    const leaves = [...stage.querySelectorAll('.leaf')];
+    const grow = () => leaves.forEach((l, i) => setTimeout(() => l.classList.add('in'), i * 105));
+
+    if (still) { leaves.forEach((l) => l.classList.add('in')); return; }
+
+    // 一开始只有底下四片，浇水后再长
+    leaves.slice(0, 4).forEach((l, i) => setTimeout(() => l.classList.add('in'), 380 + i * 105));
+
+    let watered = false;
+    const water = () => {
+      if (watered) { ctx.close(); return; }
+      watered = true;
+      root.classList.add('watering');
+      setTimeout(() => {
+        leaves.slice(4).forEach((l, i) => setTimeout(() => l.classList.add('in'), i * 95));
+      }, 700);
+      setTimeout(() => ctx.autoIn(5200), 2600);
+    };
+    ctx.setTap(water);
+    ctx.autoIn(16000);
+  }
+
+  /* ============================================================
+     6 · 沙漏 —— 时间和沙
+     ============================================================ */
+  function sHourglass(ctx) {
+    const { root, stage, name, sub, still } = ctx;
+    stage.innerHTML = `
+      <div class="hour">
+        <div class="post l"></div><div class="post r"></div>
+        <div class="cap t"></div><div class="cap b"></div>
+        <div class="glass">
+          <div class="chamber top"><div class="sandTop"></div></div>
+          <div class="chamber bot"><div class="sandBot"></div></div>
+          <div class="stream"></div>
         </div>
       </div>
-      <div class="hint">点便签</div>`;
+      <div class="txt">
+        <div class="who">${esc(name)}</div>
+        <div class="love">${esc(LOVE[6])}</div>
+        <div class="sub">${esc(sub)}</div>
+      </div>
+      <div class="hint">点一下，翻过来</div>`;
 
     if (still) {
-      root.classList.add('lifted');
+      root.classList.add('running');
       $('.hint', stage).style.opacity = '0';
       return;
     }
 
-    let lifted = false;
-    const lift = () => {
-      if (lifted) { ctx.close(); return; }
-      lifted = true;
-      root.classList.add('lifted');
-      setTimeout(() => ctx.autoIn(4400), 900);
+    let ran = false;
+    const flip = () => {
+      if (ran) { ctx.close(); return; }
+      ran = true;
+      root.classList.add('flip');
+      setTimeout(() => {
+        root.classList.add('running');
+        setTimeout(() => ctx.autoIn(5200), 5600);
+      }, 700);
     };
-    $('.note', stage).addEventListener('click', (e) => { e.stopPropagation(); lift(); });
-    ctx.setTap(lift);
-    ctx.autoIn(15000);
+    ctx.setTap(flip);
+    ctx.autoIn(17000);
   }
 
   /* ============================================================
-     6 · 星图 —— 星座连线，鼠标带动视差
+     7 · 风筝 —— 晴天的风筝和一根线
      ============================================================ */
-  function sStar(ctx) {
-    const { stage, name, sub, still } = ctx;
-    const stars = Array.from({ length: 90 }, () => {
-      const s = (0.8 + Math.random() * 1.9).toFixed(1);
-      return `<i style="left:${(Math.random() * 100).toFixed(2)}%;
-        top:${(Math.random() * 100).toFixed(2)}%;width:${s}px;height:${s}px;
-        animation-delay:${(-Math.random() * 3.6).toFixed(2)}s"></i>`;
-    }).join('');
-
-    const pts = [[12, 68], [26, 46], [40, 58], [52, 34], [66, 44], [78, 26], [88, 38]];
-    const dPath = pts.map((p, i) => `${i ? 'L' : 'M'}${p[0]} ${p[1]}`).join(' ');
-
+  function sKite(ctx) {
+    const { root, stage, name, still } = ctx;
     stage.innerHTML = `
-      <div class="sky">
-        <div class="stars">${stars}</div>
-        <div class="const">
-          <svg viewBox="0 0 100 100" preserveAspectRatio="none">
-            <path d="${dPath}"/>
+      <div class="cloud" style="left:8%;top:12%;width:34%;height:12%;opacity:.7"></div>
+      <div class="cloud" style="right:6%;top:26%;width:26%;height:9%;opacity:.5"></div>
+      <div class="cloud" style="left:22%;top:62%;width:30%;height:10%;opacity:.4"></div>
+      <div class="wrap">
+        <div class="line">
+          <svg viewBox="0 0 700 560" preserveAspectRatio="none">
+            <path d="M350 150 C 330 265, 378 340, 350 398"/>
           </svg>
         </div>
+        <div class="kite">
+          <svg viewBox="0 0 100 116">
+            <polygon points="50,2 96,42 50,78" fill="#ff7a59"/>
+            <polygon points="50,2 4,42 50,78" fill="#ff9d7e"/>
+            <polygon points="4,42 50,78 50,96" fill="#f2622e"/>
+            <polygon points="96,42 50,78 50,96" fill="#e0501f"/>
+            <line x1="50" y1="2" x2="50" y2="96" stroke="rgba(120,40,15,.35)" stroke-width="1.6"/>
+            <line x1="4" y1="42" x2="96" y2="42" stroke="rgba(120,40,15,.35)" stroke-width="1.6"/>
+            <polygon points="50,96 46,106 54,106" fill="#f4b93e"/>
+            <polygon points="50,106 45,116 55,116" fill="#ffd166"/>
+          </svg>
+        </div>
+        <div class="msg">
+          <div class="who">${esc(name)}</div>
+          <div class="love">${esc(LOVE[7])}</div>
+        </div>
       </div>
-      <div class="msg">
-        <div class="who">${esc(name)}</div>
-        <div class="love">${esc(LOVE[6])}</div>
-        <div class="say">${esc(sub)}</div>
-      </div>
-      <div class="hint">动一动鼠标</div>`;
+      <div class="hint">动一动鼠标，风筝跟着你</div>`;
 
     if (still) return;
 
-    const sky = $('.sky', stage);
+    const kite = $('.kite', stage);
+    const path = $('.line path', stage);
+    let tx = 0, ty = 0, cx = 0, cy = 0, raf = 0;
+
     const onMove = (e) => {
-      const dx = (e.clientX / innerWidth - 0.5) * -22;
-      const dy = (e.clientY / innerHeight - 0.5) * -16;
-      sky.style.transform = `translate(${dx}px,${dy}px)`;
+      tx = (e.clientX / innerWidth - 0.5) * 190;
+      ty = (e.clientY / innerHeight - 0.5) * 130;
     };
     addEventListener('mousemove', onMove);
-    ctx.autoIn(13000);
-    return () => removeEventListener('mousemove', onMove);
-  }
 
-  /* ============================================================
-     7 · 窗光 —— 晨光里的剪影
-     ============================================================ */
-  function sMorning(ctx) {
-    const { root, stage, name, still } = ctx;
-    stage.innerHTML = `
-      <div class="room"></div>
-      <div class="win"></div>
-      <div class="beam"></div>
-      <div class="msg">
-        <div class="who">${esc(name)}</div>
-        <div class="love">${esc(LOVE[7])}</div>
-      </div>
-      <div class="figure">
-        <i class="head"></i><i class="torso"></i><i class="legs"></i>
-      </div>
-      <div class="hint">点一下，把光放进来</div>`;
-
-    if (still) {
-      root.classList.add('open');
-      $('.hint', stage).style.opacity = '0';
-      return;
-    }
-    let opened = false;
-    const open = () => {
-      if (opened) { ctx.close(); return; }
-      opened = true;
-      root.classList.add('open');
-      setTimeout(() => ctx.autoIn(4600), 1100);
+    const loop = () => {
+      cx += (tx - cx) * 0.06;
+      cy += (ty - cy) * 0.06;
+      kite.style.transform = `translate(calc(-50% + ${cx.toFixed(1)}px),
+        calc(-50% + ${cy.toFixed(1)}px)) rotate(${(cx * 0.06).toFixed(2)}deg)`;
+      // 线跟着风筝走
+      const kx = 350 + cx, ky = 150 + cy;
+      path.setAttribute('d',
+        `M${kx.toFixed(0)} ${(ky + 46).toFixed(0)} C ${(kx - 30).toFixed(0)} 300, ` +
+        `${(kx + 16).toFixed(0)} 340, 350 398`);
+      raf = requestAnimationFrame(loop);
     };
-    ctx.setTap(open);
-    ctx.autoIn(15000);
+    loop();
+    ctx.autoIn(16000);
+    return () => { cancelAnimationFrame(raf); removeEventListener('mousemove', onMove); };
   }
 
   /* ============================================================
@@ -526,9 +576,9 @@
     { k: 'calendar', label: '日历', build: sCalendar },
     { k: 'vinyl', label: '唱片', build: sVinyl },
     { k: 'window', label: '车窗', build: sWindow },
-    { k: 'desk', label: '桌面', build: sDesk },
-    { k: 'star', label: '星图', build: sStar },
-    { k: 'morning', label: '窗光', build: sMorning },
+    { k: 'plant', label: '绿植', build: sPlant },
+    { k: 'hourglass', label: '沙漏', build: sHourglass },
+    { k: 'kite', label: '风筝', build: sKite },
     { k: 'origami', label: '折纸', build: sOrigami },
     { k: 'bulb', label: '灯泡', build: sBulb },
     { k: 'tape', label: '磁带', build: sTape },
