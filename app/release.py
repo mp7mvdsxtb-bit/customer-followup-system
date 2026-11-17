@@ -10,7 +10,7 @@ VERSION = "1.1.0"
 APP_NAME = "客户跟进系统"
 
 # 公开仓库：只放代码，不放客户数据
-REPO = "rockylee666/customer-followup-system"
+REPO = "mp7mvdsxtb-bit/customer-followup-system"
 REPO_URL = "https://github.com/" + REPO
 RELEASES_API = "https://api.github.com/repos/%s/releases/latest" % REPO
 RELEASES_PAGE = REPO_URL + "/releases"

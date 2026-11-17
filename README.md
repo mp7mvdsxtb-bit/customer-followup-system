@@ -36,7 +36,7 @@
 ## 从源码跑
 
 ```bash
-git clone https://github.com/rockylee666/customer-followup-system.git
+git clone https://github.com/mp7mvdsxtb-bit/customer-followup-system.git
 cd customer-followup-system
 python tools/setup_runtime.py     # 下载便携运行时到 runtime/（约 11 MB）
 双击 start.bat

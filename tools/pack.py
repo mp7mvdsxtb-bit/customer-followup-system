@@ -7,6 +7,18 @@ import zipfile
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT_DIR = os.path.dirname(ROOT)
 
+
+def version():
+    import re
+    try:
+        with open(os.path.join(ROOT, "app", "release.py"), encoding="utf-8") as f:
+            m = re.search(r'VERSION\s*=\s*"([^"]+)"', f.read())
+            if m:
+                return m.group(1)
+    except OSError:
+        pass
+    return "0.0.0"
+
 SKIP_DIRS = {"__pycache__", ".git", "shots", "node_modules", "backups"}
 SKIP_EXT = {".pyc", ".pyo", ".log", ".pdb", ".ilk", ".exp", ".lib"}
 SKIP_NAMES = {"crm.db-wal", "crm.db-shm", "server.log", "start.log", "py.zip"}
@@ -28,7 +40,8 @@ def want(path):
 
 def main():
     stamp = datetime.date.today().strftime("%Y%m%d")
-    out = os.path.join(OUT_DIR, "客户跟进系统-v1.0-%s.zip" % stamp)
+    ver = version()
+    out = os.path.join(OUT_DIR, "customer-followup-system-v%s.zip" % ver)
     if os.path.exists(out):
         os.remove(out)
     n, total = 0, 0
