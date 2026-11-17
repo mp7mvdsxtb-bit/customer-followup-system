@@ -340,16 +340,18 @@ window.addEventListener('hashchange', () => {
   } catch (e) { console.error(e); }
   if (!location.hash) location.hash = '#/today';
 
-  // 开场片头：首次进入或 ?intro=1（可被设置关掉）
+  // 开场片头：每次打开都播（可在设置里关掉，或点「今天不再显示」）
   if (introWanted() && S.settings.intro_off !== '1') {
     const q = new URLSearchParams(location.hash.split('?')[1] || '');
+    const iq = q.get('intro');
     playIntro({
-      theme: q.get('it') || S.settings.intro_theme || 'warm',
       name: S.settings.intro_name || '',
       sub: S.settings.intro_sub || '欢迎来到你的客户系统',
       note: S.settings.intro_note || '这里存着你要打的每一通电话',
       sign: S.settings.intro_sign || '',
-      still: q.get('intro') === 'still',
+      // ?intro=5 强制第 5 个场景；?intro=still&n=5 定格第 5 个用于截图
+      scene: (iq && iq !== 'still' && iq !== '1') ? iq : (q.get('n') || undefined),
+      still: iq === 'still',
     });
   }
 

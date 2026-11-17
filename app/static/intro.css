@@ -1,156 +1,331 @@
-/* intro.css —— 开场片头
-   动画一律由 JS 加 .in 类触发 + CSS transition，
-   不用 animation 的 opacity 关键帧（合成层上会卡在首帧）。 */
+/* ============================================================
+   开场片头 · 10 个场景
+   每个场景视觉与交互都不同，按日期轮换（1 天 1 个，10 天循环）。
+   动画一律靠 JS 加 .in 类 / 直接操作 canvas，
+   不用 animation 的 opacity 关键帧（合成层上会卡在首帧）。
+   ============================================================ */
 
 .intro{
-  position:fixed;inset:0;z-index:999;
+  position:fixed;inset:0;z-index:999;overflow:hidden;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  overflow:hidden;cursor:pointer;
   transition:opacity .8s cubic-bezier(.32,.72,0,1), transform .8s cubic-bezier(.32,.72,0,1);
+  user-select:none;
 }
-.intro.out{opacity:0;transform:scale(1.03);pointer-events:none}
-
-/* ── 暖光 ─────────────────────────────────────── */
-.intro[data-theme="warm"]{
-  background:linear-gradient(158deg,#fffafc 0%,#fdeef5 36%,#f6ecfb 68%,#fdf7fa 100%);
-  --i-text:#3f2c3a; --i-dim:#a0859a; --i-accent:#d4638f;
-  --i-rule:rgba(212,99,143,.34); --i-dot:rgba(212,99,143,.5);
-  --i-glow-a:rgba(255,186,214,.5); --i-glow-b:rgba(207,187,255,.38);
-}
-/* ── 星河 ─────────────────────────────────────── */
-.intro[data-theme="star"]{
-  background:radial-gradient(ellipse 130% 100% at 50% 26%,#1e1733 0%,#120e20 44%,#07060d 100%);
-  --i-text:#f5efff; --i-dim:#9b8fc2; --i-accent:#c9a6ff;
-  --i-rule:rgba(201,166,255,.32); --i-dot:rgba(201,166,255,.62);
-  --i-glow-a:rgba(122,80,216,.4); --i-glow-b:rgba(226,116,178,.22);
-}
-/* ── 素白 ─────────────────────────────────────── */
-.intro[data-theme="plain"]{
-  background:#fff;
-  --i-text:#141414; --i-dim:#9a9a9a; --i-accent:#c2496f;
-  --i-rule:rgba(194,73,111,.28); --i-dot:rgba(194,73,111,.38);
-  --i-glow-a:rgba(255,216,230,.55); --i-glow-b:rgba(232,224,255,.4);
-}
-
-.i-canvas{position:absolute;inset:0;pointer-events:none}
-.i-glow{
-  position:absolute;border-radius:50%;filter:blur(64px);pointer-events:none;
-  opacity:0;transition:opacity 2.2s ease;
-}
-.intro.ready .i-glow{opacity:1}
-.i-glow-a{width:64vmax;height:64vmax;left:-18vmax;top:-24vmax;
-  background:radial-gradient(circle,var(--i-glow-a),transparent 68%);
-  animation:i-drift 15s ease-in-out infinite alternate}
-.i-glow-b{width:54vmax;height:54vmax;right:-16vmax;bottom:-22vmax;
-  background:radial-gradient(circle,var(--i-glow-b),transparent 70%);
-  animation:i-drift 19s ease-in-out infinite alternate-reverse}
-@keyframes i-drift{
-  from{transform:translate3d(0,0,0) scale(1)}
-  to{transform:translate3d(3.5vmax,2.5vmax,0) scale(1.1)}
-}
-
-/* ── 内容 ─────────────────────────────────────── */
-.i-content{position:relative;z-index:2;text-align:center;padding:0 24px;color:var(--i-text)}
-
-.i-eyebrow{
-  font-size:11px;font-weight:600;letter-spacing:.12em;
-  color:var(--i-dim);
-  opacity:0;transform:translateY(7px);
-  transition:opacity .9s cubic-bezier(.32,.72,0,1),transform .9s cubic-bezier(.32,.72,0,1);
-}
-.i-eyebrow em{
-  font-style:normal;font-size:9.5px;letter-spacing:.36em;
-  margin-right:11px;text-transform:uppercase;opacity:.72;
-}
-.i-eyebrow.in{opacity:1;transform:none}
-
+.intro.out{opacity:0;transform:scale(1.02);pointer-events:none}
 .intro.still *{transition:none!important;animation:none!important}
 
+.i-canvas{position:absolute;inset:0;pointer-events:none}
+.i-content{position:relative;z-index:3;text-align:center;padding:0 24px;
+  color:var(--i-text,#3f2c3a)}
 .i-name{
-  margin:20px 0 0;font-weight:400;
+  margin:0;font-weight:400;
   font-family:"Kaiti SC","STKaiti","KaiTi","楷体","Songti SC","SimSun",serif;
-  font-size:clamp(44px,9vw,100px);line-height:1.14;
+  font-size:clamp(42px,8.6vw,96px);line-height:1.16;
   letter-spacing:.1em;text-indent:.1em;
-  display:flex;justify-content:center;gap:.06em;flex-wrap:wrap;
+  display:flex;justify-content:center;gap:.05em;flex-wrap:wrap;
 }
-.i-name span{
-  display:inline-block;opacity:0;
-  transform:translateY(.4em) rotate(2deg);
-  filter:blur(7px);
-  transition:opacity 1s cubic-bezier(.19,1,.22,1),
-             transform 1s cubic-bezier(.19,1,.22,1),
-             filter .9s cubic-bezier(.19,1,.22,1);
-  text-shadow:0 2px 34px rgba(212,99,143,.14);
-}
-.i-name span.in{opacity:1;transform:none;filter:none}
-[data-theme="star"] .i-name span{text-shadow:0 0 48px rgba(201,166,255,.45)}
-
-.i-rule{
-  height:1px;width:0;margin:30px auto 0;
-  background:linear-gradient(90deg,transparent,var(--i-rule) 18%,var(--i-accent) 50%,
-                             var(--i-rule) 82%,transparent);
-  opacity:.85;
-  transition:width 1.2s cubic-bezier(.32,.72,0,1);
-}
-.i-rule.in{width:min(240px,46vw)}
-
-.i-sub{
-  margin:24px 0 0;font-size:clamp(15px,1.55vw,18px);font-weight:400;
-  letter-spacing:.22em;text-indent:.22em;
-  opacity:0;transform:translateY(10px);
-  transition:opacity 1s cubic-bezier(.32,.72,0,1),transform 1s cubic-bezier(.32,.72,0,1);
-}
-.i-sub.in{opacity:1;transform:none}
-
-.i-note{
-  margin:17px 0 0;font-size:clamp(12px,1.05vw,13.5px);
-  letter-spacing:.15em;text-indent:.15em;color:var(--i-dim);
-  opacity:0;transform:translateY(8px);
-  transition:opacity 1.1s cubic-bezier(.32,.72,0,1) .1s,transform 1.1s cubic-bezier(.32,.72,0,1) .1s;
-}
-.i-note.in{opacity:1;transform:none}
-
-.i-heart{
-  display:inline-block;width:11px;height:11px;margin-left:7px;vertical-align:-1px;
-  animation:i-beat 1.7s ease-in-out infinite;
-}
-.i-heart svg{width:100%;height:100%;fill:var(--i-accent)}
+.i-eyebrow{font-size:11px;font-weight:600;letter-spacing:.12em;color:var(--i-dim,#9a8f94)}
+.i-eyebrow em{font-style:normal;font-size:9.5px;letter-spacing:.36em;margin-right:11px;
+  text-transform:uppercase;opacity:.72}
+.i-sub{margin:22px 0 0;font-size:clamp(14px,1.5vw,17px);letter-spacing:.2em;text-indent:.2em}
+.i-note{margin:15px 0 0;font-size:clamp(11px,1vw,13px);letter-spacing:.14em;
+  text-indent:.14em;color:var(--i-dim,#9a8f94)}
+.i-heart{display:inline-block;width:11px;height:11px;margin-left:7px;vertical-align:-1px}
+.i-heart svg{width:100%;height:100%;fill:var(--i-accent,#d4638f)}
 @keyframes i-beat{
   0%,100%{opacity:.3;transform:scale(.85)}
   16%{opacity:1;transform:scale(1.1)}
   34%{opacity:.6;transform:scale(.95)}
   52%{opacity:.9;transform:scale(1.03)}
 }
+.i-foot{position:absolute;bottom:34px;left:0;right:0;z-index:4;text-align:center;color:var(--i-dim,#9a8f94)}
+.i-sign{font-family:"Kaiti SC","STKaiti","KaiTi","楷体",serif;font-size:14px;
+  letter-spacing:.14em;opacity:.72}
+.i-hint{font-size:10.5px;letter-spacing:.18em;margin-top:8px;opacity:.62}
 
-.i-foot{
-  position:absolute;bottom:38px;left:0;right:0;text-align:center;z-index:2;
-  color:var(--i-dim);
-  opacity:0;transform:translateY(8px);
-  transition:opacity 1.1s ease,transform 1.1s ease;
+/* 顶部工具条：跳过 / 今天不再显示 / 场景编号 */
+.i-bar{
+  position:absolute;top:16px;right:18px;z-index:9;display:flex;gap:8px;align-items:center;
 }
-.i-foot.in{opacity:1;transform:none}
-.i-sign{
-  font-family:"Kaiti SC","STKaiti","KaiTi","楷体","Songti SC",serif;
-  font-size:15px;letter-spacing:.14em;color:var(--i-text);opacity:.72;
+.i-bar button{
+  font-size:11px;letter-spacing:.06em;padding:5px 11px;border-radius:999px;
+  background:transparent;border:1px solid currentColor;cursor:pointer;
+  color:var(--i-dim,#9a8f94);transition:color .2s,opacity .2s;opacity:.62;
 }
-.i-hint{font-size:10.5px;letter-spacing:.2em;margin-top:9px;opacity:.7}
+.i-bar button:hover{opacity:1}
+.i-scene-tag{
+  position:absolute;left:18px;bottom:16px;z-index:9;font-size:10px;letter-spacing:.16em;
+  color:var(--i-dim,#9a8f94);opacity:.5;font-variant-numeric:tabular-nums;
+}
 
-.i-skip{
-  position:absolute;top:20px;right:22px;z-index:3;
-  font-size:11.5px;letter-spacing:.06em;color:var(--i-dim);
-  background:none;border:1px solid currentColor;border-radius:999px;
-  padding:5px 13px;cursor:pointer;
-  opacity:0;transition:opacity .6s ease,color .2s;
+/* ══════════════════════════════════════════════════════════
+   场景 1 · 逐字浮现（暖光 + 光点）
+   交互：点击任意处进入
+   ══════════════════════════════════════════════════════════ */
+.intro[data-scene="1"]{
+  background:linear-gradient(158deg,#fffafc 0%,#fdeef5 36%,#f6ecfb 68%,#fdf7fa 100%);
+  --i-text:#3f2c3a; --i-dim:#a0859a; --i-accent:#d4638f;
+  --i-glow-a:rgba(255,186,214,.5); --i-glow-b:rgba(207,187,255,.38);
 }
-.i-skip.in{opacity:.72}
-.i-skip:hover{opacity:1;color:var(--i-text)}
+.s1 .i-name span{
+  display:inline-block;opacity:0;transform:translateY(.4em) rotate(2deg);filter:blur(7px);
+  transition:opacity 1s cubic-bezier(.19,1,.22,1),transform 1s cubic-bezier(.19,1,.22,1),
+             filter .9s cubic-bezier(.19,1,.22,1);
+  text-shadow:0 2px 34px rgba(212,99,143,.14);
+}
+.s1 .i-name span.in{opacity:1;transform:none;filter:none}
+.s1 .i-rule{height:1px;width:0;margin:28px auto 0;opacity:.85;
+  background:linear-gradient(90deg,transparent,rgba(212,99,143,.34) 18%,
+    var(--i-accent) 50%,rgba(212,99,143,.34) 82%,transparent);
+  transition:width 1.2s cubic-bezier(.32,.72,0,1);}
+.s1 .i-rule.in{width:min(240px,46vw)}
+.s1 .i-sub,.s1 .i-note,.s1 .i-foot,.s1 .i-eyebrow{
+  opacity:0;transform:translateY(9px);
+  transition:opacity 1s cubic-bezier(.32,.72,0,1),transform 1s cubic-bezier(.32,.72,0,1);}
+.s1 .in{opacity:1;transform:none}
+
+/* ══════════════════════════════════════════════════════════
+   场景 2 · 打字机（终端感）
+   交互：点击 / 按任意键加速；打完后点击进入
+   ══════════════════════════════════════════════════════════ */
+.intro[data-scene="2"]{
+  background:radial-gradient(ellipse 120% 90% at 50% 40%,#0e1520 0%,#080b11 60%,#04060a 100%);
+  --i-text:#c8f5d8; --i-dim:#4f7a5f; --i-accent:#5ee89b;
+}
+.s2{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace}
+.s2 .term{
+  width:min(660px,88vw);text-align:left;
+  border:1px solid rgba(94,232,155,.16);border-radius:10px;
+  background:rgba(6,14,10,.72);padding:20px 22px;
+  box-shadow:0 0 60px rgba(94,232,155,.07),inset 0 0 40px rgba(94,232,155,.03);
+}
+.s2 .tl{display:flex;gap:6px;margin-bottom:14px}
+.s2 .tl i{width:9px;height:9px;border-radius:50%;background:#2a3a30}
+.s2 .tl i:first-child{background:#f87171}.s2 .tl i:nth-child(2){background:#fbbf24}
+.s2 .tl i:nth-child(3){background:#34d399}
+.s2 .line{font-size:clamp(13px,1.5vw,15px);line-height:1.9;color:var(--i-text);
+  white-space:pre-wrap;word-break:break-word;min-height:1.9em}
+.s2 .line .p{color:#3d6b52}
+.s2 .cursor{display:inline-block;width:8px;height:1.05em;background:var(--i-accent);
+  vertical-align:-3px;animation:i-blink 1s steps(2,start) infinite}
+@keyframes i-blink{0%,50%{opacity:1}50.01%,100%{opacity:0}}
+.s2 .out{opacity:0;transition:opacity .5s}
+.s2 .out.in{opacity:1}
+
+/* ══════════════════════════════════════════════════════════
+   场景 3 · 双幕拉开
+   交互：点击一次拉开幕布，再点一次进入
+   ══════════════════════════════════════════════════════════ */
+.intro[data-scene="3"]{
+  background:radial-gradient(ellipse 100% 80% at 50% 50%,#fdf3f6 0%,#f7e8ee 60%,#efe0e8 100%);
+  --i-text:#4a3340; --i-dim:#a8899a; --i-accent:#c9729a;
+}
+.s3 .curtain{
+  position:absolute;top:0;bottom:0;width:50.5%;z-index:5;
+  background:linear-gradient(90deg,#8c4a63 0%,#a85b78 22%,#c47b95 55%,#a85b78 100%);
+  box-shadow:inset -30px 0 60px rgba(60,20,35,.35);
+  transition:transform 1.5s cubic-bezier(.65,0,.35,1);
+}
+.s3 .curtain.l{left:0;transform-origin:left center}
+.s3 .curtain.r{right:0;transform-origin:right center;
+  background:linear-gradient(270deg,#8c4a63 0%,#a85b78 22%,#c47b95 55%,#a85b78 100%);
+  box-shadow:inset 30px 0 60px rgba(60,20,35,.35)}
+.s3.open .curtain.l{transform:translateX(-102%)}
+.s3.open .curtain.r{transform:translateX(102%)}
+.s3 .i-content{opacity:0;transform:scale(.97);
+  transition:opacity 1.1s ease .55s,transform 1.1s cubic-bezier(.32,.72,0,1) .55s}
+.s3.open .i-content{opacity:1;transform:none}
+.s3 .pull{
+  position:absolute;z-index:6;font-size:11.5px;letter-spacing:.3em;color:rgba(255,255,255,.72);
+  bottom:16%;left:50%;transform:translateX(-50%);pointer-events:none;
+  transition:opacity .5s;
+}
+.s3.open .pull{opacity:0}
+
+/* ══════════════════════════════════════════════════════════
+   场景 4 · 粒子聚拢
+   交互：鼠标移动会吹散粒子，松开自动重新聚拢
+   ══════════════════════════════════════════════════════════ */
+.intro[data-scene="4"]{
+  background:radial-gradient(ellipse 110% 90% at 50% 45%,#131a2b 0%,#0a0e18 55%,#05070c 100%);
+  --i-text:#e8eefc; --i-dim:#6b7a9e; --i-accent:#7aa2ff;
+}
+.s4 .i-content{opacity:0;transition:opacity 1.2s ease}
+.s4.formed .i-content{opacity:1}
+.s4 .i-name{letter-spacing:.16em}
+
+/* ══════════════════════════════════════════════════════════
+   场景 5 · 光束扫过
+   交互：点击加速光束
+   ══════════════════════════════════════════════════════════ */
+.intro[data-scene="5"]{
+  background:#0a0a0c;
+  --i-text:#f6efe0; --i-dim:#8c7f66; --i-accent:#e8c47a;
+}
+.s5 .stage{position:relative;z-index:3;text-align:center}
+.s5 .dim{position:relative;display:inline-block}
+.s5 .dim .i-name,.s5 .dim .i-sub{color:rgba(246,239,224,.09)}
+.s5 .lit{
+  position:absolute;inset:0;overflow:hidden;pointer-events:none;
+  clip-path:inset(0 calc(100% - var(--x,0%)) 0 0);transition:clip-path .1s linear;
+}
+.s5 .lit .i-name,.s5 .lit .i-sub{color:var(--i-text)}
+.s5 .beam{
+  position:absolute;top:-30%;bottom:-30%;width:120px;z-index:4;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(232,196,122,.16) 45%,
+    rgba(255,240,210,.42) 50%,rgba(232,196,122,.16) 55%,transparent);
+  transform:translateX(-140px);filter:blur(6px);
+}
+.s5 .i-note,.s5 .i-foot{opacity:0;transition:opacity .9s}
+.s5.done .i-note,.s5.done .i-foot{opacity:1}
+/* 扫完之后：底图文字直接变成亮的，亮层和光束收掉 */
+.s5.done .dim .i-name,.s5.done .dim .i-sub{color:var(--i-text)}
+.s5.done .lit,.s5.done .beam{display:none}
+
+/* ══════════════════════════════════════════════════════════
+   场景 6 · 翻转卡片
+   交互：点击卡片翻面
+   ══════════════════════════════════════════════════════════ */
+.intro[data-scene="6"]{
+  background:linear-gradient(160deg,#f8f5ff 0%,#f0ecfc 50%,#fbf7ff 100%);
+  --i-text:#332b4a; --i-dim:#8f86a8; --i-accent:#8b7dd8;
+}
+.s6 .flip{
+  perspective:1200px;width:min(520px,86vw);height:min(300px,44vh);
+  position:relative;z-index:3;cursor:pointer;
+}
+.s6 .card3d{
+  position:relative;width:100%;height:100%;transform-style:preserve-3d;
+  transition:transform 1.1s cubic-bezier(.65,0,.35,1);
+}
+.s6.flipped .card3d{transform:rotateY(180deg)}
+.s6 .face{
+  position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  border:1px solid rgba(139,125,216,.22);background:#fff;
+  box-shadow:0 20px 50px rgba(80,60,140,.13);
+}
+.s6 .back{transform:rotateY(180deg);
+  background:linear-gradient(150deg,#fff,#f7f3ff)}
+.s6 .seal{
+  width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#a99cf0,#7f6fd4);
+  display:grid;place-items:center;color:#fff;font-size:20px;
+  font-family:"Kaiti SC","STKaiti","KaiTi",serif;
+  box-shadow:0 8px 22px rgba(120,100,220,.3);
+}
+.s6 .cardtip{margin-top:16px;font-size:11.5px;letter-spacing:.24em;color:var(--i-dim)}
+
+/* ══════════════════════════════════════════════════════════
+   场景 7 · 水墨
+   交互：长按让墨迹扩散
+   ══════════════════════════════════════════════════════════ */
+.intro[data-scene="7"]{
+  background:#f7f4ee;
+  --i-text:#1f1b18; --i-dim:#8a8177; --i-accent:#3a332c;
+}
+.s7{background-image:
+  radial-gradient(circle at 20% 30%,rgba(180,170,150,.10),transparent 40%),
+  radial-gradient(circle at 78% 68%,rgba(170,160,140,.10),transparent 45%);}
+.s7 .inkwrap{position:relative;z-index:3;text-align:center}
+.s7 .i-name{
+  color:var(--i-text);
+  -webkit-mask-image:radial-gradient(circle at var(--mx,50%) var(--my,50%),
+    #000 0, #000 var(--r,0px), transparent calc(var(--r,0px) + 40px));
+  mask-image:radial-gradient(circle at var(--mx,50%) var(--my,50%),
+    #000 0, #000 var(--r,0px), transparent calc(var(--r,0px) + 40px));
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+}
+.s7 .inkhint{position:absolute;bottom:18%;left:0;right:0;text-align:center;
+  font-size:11.5px;letter-spacing:.3em;color:var(--i-dim);
+  transition:opacity .6s}
+.s7.revealed .inkhint{opacity:0}
+
+/* ══════════════════════════════════════════════════════════
+   场景 8 · 数字雨
+   交互：滚动滚轮加速
+   ══════════════════════════════════════════════════════════ */
+.intro[data-scene="8"]{
+  background:#04070a;
+  --i-text:#d9f7ff; --i-dim:#3f6b78; --i-accent:#35d6ff;
+}
+.s8 .i-content{background:radial-gradient(ellipse 70% 60% at 50% 50%,
+  rgba(4,7,10,.92) 0%,rgba(4,7,10,.72) 55%,transparent 100%);
+  padding:44px 60px}
+.s8 .i-name{text-shadow:0 0 32px rgba(53,214,255,.45)}
+.s8 .i-content{opacity:0;transition:opacity 1s ease}
+.s8.ready .i-content{opacity:1}
+
+/* ══════════════════════════════════════════════════════════
+   场景 9 · 呼吸光团（鼠标跟随）
+   交互：鼠标靠近时光团跟随
+   ══════════════════════════════════════════════════════════ */
+.intro[data-scene="9"]{
+  background:radial-gradient(ellipse 100% 90% at 50% 50%,#171029 0%,#0d0a18 55%,#07050d 100%);
+  --i-text:#f0e8ff; --i-dim:#7a6a9c; --i-accent:#b18cff;
+}
+.s9 .orb{
+  position:absolute;width:46vmax;height:46vmax;border-radius:50%;z-index:1;
+  background:radial-gradient(circle,rgba(177,140,255,.30) 0%,rgba(120,90,220,.12) 42%,transparent 68%);
+  filter:blur(40px);pointer-events:none;
+  transition:transform .9s cubic-bezier(.32,.72,0,1);will-change:transform;
+}
+.s9 .orb2{
+  position:absolute;width:26vmax;height:26vmax;border-radius:50%;z-index:1;
+  background:radial-gradient(circle,rgba(255,170,220,.20),transparent 66%);
+  filter:blur(50px);pointer-events:none;transition:transform 1.4s cubic-bezier(.32,.72,0,1);
+}
+.s9 .i-content{opacity:0;transform:translateY(10px);
+  transition:opacity 1.3s ease .2s,transform 1.3s cubic-bezier(.32,.72,0,1) .2s}
+.s9.in .i-content{opacity:1;transform:none}
+.s9 .i-name{text-shadow:0 0 60px rgba(177,140,255,.4)}
+
+/* ══════════════════════════════════════════════════════════
+   场景 10 · 胶片
+   交互：自动播放，无操作（5 秒后进入）
+   ══════════════════════════════════════════════════════════ */
+.intro[data-scene="10"]{
+  background:#0b0b0b;
+  --i-text:#efe9dd; --i-dim:#8a8177; --i-accent:#d8cbb4;
+}
+.s10 .grain{
+  position:absolute;inset:-50%;z-index:2;pointer-events:none;opacity:.16;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E");
+  animation:i-grain .5s steps(3) infinite;
+}
+@keyframes i-grain{
+  0%{transform:translate(0,0)}33%{transform:translate(-3%,2%)}66%{transform:translate(2%,-2%)}
+}
+.s10 .bars{
+  position:absolute;inset:0;z-index:2;pointer-events:none;opacity:.5;
+  background:repeating-linear-gradient(180deg,transparent 0 3px,rgba(0,0,0,.22) 3px 4px);
+}
+.s10 .vignette{
+  position:absolute;inset:0;z-index:2;pointer-events:none;
+  box-shadow:inset 0 0 200px 60px rgba(0,0,0,.75);
+}
+.s10 .i-content{filter:sepia(.3) contrast(1.06);
+  opacity:0;transform:scale(1.03);
+  transition:opacity 1.8s ease,transform 2.4s ease}
+.s10.in .i-content{opacity:1;transform:none}
+.s10 .i-name{letter-spacing:.18em;text-shadow:0 0 24px rgba(239,233,221,.22)}
+.s10 .flash{
+  position:absolute;inset:0;z-index:8;background:#fff;opacity:0;pointer-events:none;
+  transition:opacity .45s ease;
+}
+.s10.flash .flash{opacity:1}
+
+/* 通用淡入（各场景复用） */
+.i-fade{opacity:0;transform:translateY(8px);
+  transition:opacity 1s cubic-bezier(.32,.72,0,1),transform 1s cubic-bezier(.32,.72,0,1)}
+.i-fade.in{opacity:1;transform:none}
 
 @media (max-width:520px){
   .i-name{letter-spacing:.05em}
-  .i-foot{bottom:26px;font-size:10.5px}
+  .i-foot{bottom:22px}
+  .s8 .i-content{padding:30px 22px}
+  .i-bar{top:12px;right:12px}
 }
 @media (prefers-reduced-motion:reduce){
-  .i-glow{animation:none}
-  .i-name span{filter:none;transform:none;transition:opacity .3s}
-  .i-heart{animation:none;opacity:1}
+  .s10 .grain{animation:none}
+  .s2 .cursor{animation:none}
 }
