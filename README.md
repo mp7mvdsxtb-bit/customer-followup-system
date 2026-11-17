@@ -65,8 +65,7 @@ data/backups/    ← 设置页「备份数据库」生成的时间点快照
 - 替换前先做语法检查，坏的代码不会被执行
 - 替换由独立的 helper 进程完成，完成后自动重启服务
 
-发布新版：改 `app/release.py` 里的 `VERSION`，打一个 `v1.2.0` 的 tag，
-把打包好的 zip 作为 Release 附件上传即可。程序靠 tag 判断版本。
+两个版本使用各自独立的 Release 通道：带开场使用 `with-intro-v版本号`，无开场使用 `no-intro-v版本号`。发布时在对应分支更新 `app/release.py` 的版本号，创建对应标签和 Release；附件分别命名为 `customer-followup-with-intro-v版本号.zip` 或 `customer-followup-no-intro-v版本号.zip`。更新包以单个顶层目录包含程序文件，绝不能包含 `data/`、数据库、表格或客户资料。每个版本只会选择自己的附件，缺少对应附件时不会安装。新通道的 Release 应设为不覆盖 GitHub 的 Latest，避免旧客户端误选。
 
 ## 实现
 
