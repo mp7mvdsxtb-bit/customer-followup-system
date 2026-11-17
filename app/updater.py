@@ -7,6 +7,7 @@
 """
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -45,9 +46,25 @@ def check():
         "asset": None,
         "error": "",
     }
+    # 按通道和版本选择 Release，逐页扫描以免遗漏旧通道。
+    prefix = release.UPDATE_CHANNEL + "-v"
+    candidates = []
+    page = 1
     try:
-        raw = _fetch(release.RELEASES_API, timeout=8)
-        data = json.loads(raw.decode("utf-8"))
+        while True:
+            raw = _fetch(release.RELEASES_API + "?per_page=100&page=%d" % page, timeout=8)
+            items = json.loads(raw.decode("utf-8"))
+            if not isinstance(items, list):
+                raise ValueError("invalid release list")
+            for item in items:
+                tag = (item.get("tag_name") or "").strip()
+                version = tag[len(prefix):] if tag.startswith(prefix) else ""
+                if (not item.get("draft") and not item.get("prerelease")
+                        and re.fullmatch(r"\d+\.\d+\.\d+", version)):
+                    candidates.append((release.parse_ver(version), version, item))
+            if len(items) < 100:
+                break
+            page += 1
     except urllib.error.HTTPError as e:
         out["error"] = "仓库还没有发布版本" if e.code == 404 else "GitHub 返回 %d" % e.code
         return out
@@ -55,18 +72,25 @@ def check():
         out["error"] = "连不上 GitHub（%s）" % type(e).__name__
         return out
 
-    tag = (data.get("tag_name") or "").strip()
-    out["latest"] = tag.lstrip("vV")
+    if not candidates:
+        out["error"] = "此版本的更新通道尚无发布版本"
+        return out
+    _, version, data = max(candidates, key=lambda item: item[0])
+    out["latest"] = version
     out["notes"] = (data.get("body") or "").strip()[:1200]
     out["published"] = (data.get("published_at") or "")[:10]
     out["url"] = data.get("html_url") or release.RELEASES_PAGE
-    out["has_update"] = bool(tag) and release.is_newer(tag)
-    for a in data.get("assets") or []:
-        if (a.get("name") or "").lower().endswith(".zip"):
-            out["asset"] = {"name": a["name"],
-                            "url": a.get("browser_download_url"),
-                            "size": a.get("size", 0)}
+    expected = "customer-followup-%s-v%s.zip" % (release.UPDATE_CHANNEL, version)
+    for asset in data.get("assets") or []:
+        if asset.get("name") == expected and asset.get("browser_download_url"):
+            out["asset"] = {"name": expected, "url": asset["browser_download_url"],
+                            "size": asset.get("size", 0)}
             break
+    if release.is_newer(version):
+        if out["asset"]:
+            out["has_update"] = True
+        else:
+            out["error"] = "此版本缺少对应的更新包，请稍后重试"
     return out
 
 
@@ -78,7 +102,7 @@ def _safe_members(zf):
         name = info.filename.replace("\\", "/")
         parts = name.split("/")
         rel = "/".join(parts[1:]) if len(parts) > 1 else parts[0]
-        if not rel or rel.endswith("/"):
+        if not rel or rel.endswith("/") or ".." in rel.split("/"):
             continue
         ok = rel.startswith(release.UPDATE_ALLOW) or rel in release.UPDATE_ALLOW_FILES
         if not ok:
