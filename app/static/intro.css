@@ -1,38 +1,664 @@
-/* 十个交互场景 */
-.intro{position:fixed;inset:0;z-index:999;overflow:hidden;color:var(--ink);background:var(--bg);font-family:"Microsoft YaHei",sans-serif;transition:opacity .5s;user-select:none}.intro.out{opacity:0;pointer-events:none}.intro *{box-sizing:border-box}.intro.still *{transition:none!important;animation:none!important}
-.i-bar{position:absolute;right:22px;top:20px;z-index:10;display:flex;gap:10px}.i-bar button{border:1px solid currentColor;color:inherit;opacity:.72;background:transparent;border-radius:24px;padding:7px 14px;cursor:pointer;font-size:12px}.i-bar button:hover,.i-bar button:focus-visible{opacity:1}.intro .copy{position:absolute;z-index:4;left:9%;top:50%;width:38%;transform:translateY(-50%)}.intro .eyebrow{font-size:12px;letter-spacing:.2em;opacity:.65;font-weight:700}.intro h1{font:normal clamp(30px,4vw,60px)/1.25 "Songti SC",SimSun,serif;letter-spacing:.08em;margin:22px 0}.intro .name{font-size:14px;letter-spacing:.22em;opacity:.8}.intro p{font-size:clamp(14px,1.3vw,17px);line-height:1.9;letter-spacing:.09em;max-width:420px}.intro .sign{font-family:KaiTi,serif;margin-top:20px}.intro .hint{font-size:12px;letter-spacing:.15em;margin-top:45px;opacity:.7}.intro .art{position:absolute;right:7%;top:50%;width:min(48vw,650px);height:min(70vh,550px);transform:translateY(-50%);touch-action:none}.intro .art *{position:absolute}.intro .art:before,.intro .art:after{position:absolute;pointer-events:none}.intro button{font:inherit}
-/* 1 宝箱：拖钥匙 */
-.n1{--bg:#162d31;--ink:#f8e9c5;background:radial-gradient(circle at 72% 40%,#41665b,#162d31 65%)}.n1 .chest{width:55%;height:38%;left:22%;top:42%;border-radius:8px 8px 32px 32px;background:linear-gradient(90deg,#6e3e2d,#b8794c 50%,#643424);border:7px solid #d6ae6b;box-shadow:0 35px 50px #0b171a80}.n1 .lid{width:104%;height:45%;left:-2%;top:-34%;border:7px solid #d6ae6b;border-radius:70px 70px 8px 8px;background:#9b5c3c;transform-origin:bottom;transition:transform 1s}.n1 .lock{left:42%;top:12%;font-size:55px;color:#f4d58f}.n1 .key{font-size:75px;left:46%;top:12%;transform:translateY(var(--drag,0));transition:opacity .4s}.n1.active .lid{transform:rotateX(130deg)}.n1.active .key{opacity:0}.n1.active .chest{box-shadow:0 -35px 90px #ffe9a177}
-/* 2 礼物：撕开 */
-.n2{--bg:#f2c6b9;--ink:#693c45;background:linear-gradient(130deg,#f4d3c3,#e99da0)}.n2 .gift{width:55%;height:53%;left:23%;top:25%;background:#fff0df;box-shadow:18px 22px 0 #bd747838;transform:rotate(-5deg);transition:transform 1s,opacity 1s}.n2 .ribbon-v{left:42%;width:16%;height:100%;background:#c9526e}.n2 .ribbon-h{top:42%;height:16%;width:100%;background:#c9526e}.n2 .bow{font-size:115px;color:#aa3455;left:34%;top:-26%}.n2.active .gift{transform:rotate(16deg) translate(90px,-130px);opacity:.15}.n2.active .art:after{content:'♡';color:#fff8ef;font-size:230px;left:32%;top:16%;animation:rise 1s both}
-/* 3 星际：拨发射杆 */
-.n3{--bg:#101631;--ink:#f0efff;background:radial-gradient(circle at 78% 35%,#524478,#101631 60%)}.n3 .art{background:radial-gradient(circle at 30% 20%,#fff 1px,transparent 2px),radial-gradient(circle at 80% 15%,#fff 1px,transparent 2px),radial-gradient(circle at 55% 70%,#fff 1px,transparent 2px)}.n3 .planet{width:65%;aspect-ratio:1;border-radius:50%;left:16%;top:15%;background:linear-gradient(135deg,#f6a780,#bd648f);box-shadow:0 0 70px #e9869d55}.n3 .rocket{font-size:clamp(90px,14vw,180px);left:32%;top:28%;transition:transform 2s,opacity 2s}.n3 .lever{width:35px;height:120px;background:#47435d;border-radius:30px;right:4%;bottom:10%;border:3px solid #9990bb}.n3 .lever span{width:25px;height:25px;border-radius:50%;background:#ff7a8e;left:2px;top:6px;transition:top .5s}.n3.active .lever span{top:80px}.n3.active .rocket{transform:translate(250px,-250px);opacity:0}
-/* 4 镜面：擦雾 */
-.n4{--bg:#cadbdd;--ink:#3f6065;background:linear-gradient(135deg,#dceced,#87a8aa)}.n4 .mirror{left:18%;top:4%;width:64%;height:90%;border:16px solid #b99a70;border-radius:48% 48% 8px 8px;background:linear-gradient(125deg,#86b6bd,#e9f1eb 55%,#9fc8ca);box-shadow:15px 20px 45px #3d656438;overflow:hidden}.n4 .reflection{font-size:160px;color:#fff;left:33%;top:22%}.n4 .mist{inset:0;background:linear-gradient(135deg,#eff8f5,#bcd5d5);opacity:var(--mist,1);transition:opacity .15s}.n4.active .mist{opacity:0}
-/* 5 水族馆：加水 */
-.n5{--bg:#edf7f1;--ink:#315b5b;background:linear-gradient(#edf9f3,#cce9df)}.n5 .tank{left:14%;top:21%;width:72%;height:58%;border:10px solid #86bfb6;border-radius:10px 10px 38px 38px;background:#ffffff80;overflow:hidden;box-shadow:0 20px 0 #aed3c3}.n5 .water{bottom:0;width:100%;height:36%;background:#78c8c6aa;transition:height 2s}.n5.active .water{height:85%}.n5 .water span{font-size:65px;top:20%;left:35%;animation:swim 4s ease-in-out infinite alternate}.n5 .water i{top:0;left:60%;font-size:30px;color:white}.n5 .seaweed{bottom:0;font-size:42px;color:#559c7d;left:10%;width:90%}.n5 .tap{right:4%;top:7%;border-radius:50%;background:#fff;color:#539b91;width:62px;height:62px;text-align:center;line-height:62px;font-size:36px}
-/* 6 罗盘：翻转 */
-.n6{--bg:#e6ddc4;--ink:#554b39;background:repeating-linear-gradient(10deg,#e8dfc9,#e8dfc9 3px,#e5dac1 4px,#e5dac1 6px)}.n6 .compass{width:min(70%,360px);aspect-ratio:1;border-radius:50%;top:12%;left:15%;border:14px double #856f4d;background:radial-gradient(#fffdf0,#d2bd91);box-shadow:12px 24px 35px #5c493b55;transition:transform 1s}.n6.active .compass{transform:rotateY(180deg) rotate(180deg)}.n6 .compass-ring{inset:8%;border:2px dashed #a88e5e;border-radius:50%;text-align:center;padding-top:8px;font:24px Georgia;color:#6f543a}.n6 .compass-ring span{position:absolute;bottom:8px;left:47%}.n6 .needle{font-size:150px;left:32%;top:23%;color:#b8513e;text-shadow:0 2px #fff}
-/* 7 气球：跟随 */
-.n7{--bg:#b9e4f1;--ink:#2f596b;background:linear-gradient(#9fd8ec,#e4f5ef)}.n7 .cloud{width:180px;height:55px;background:#ffffffc7;border-radius:60px;filter:blur(1px)}.n7 .cloud:before{content:'';position:absolute;width:80px;height:80px;border-radius:50%;background:inherit;bottom:0;left:40px}.n7 .c1{top:20%;left:2%}.n7 .c2{top:52%;right:0;transform:scale(.7)}.n7 .balloon{width:145px;height:178px;border-radius:50% 50% 46% 46%;background:linear-gradient(120deg,#ff9c8c,#e96375);left:38%;top:19%;text-align:center;padding-top:50px;color:#fff8;font-size:55px;transform:translate(var(--bx,0),var(--by,0));transition:transform .2s;box-shadow:inset -12px -10px 25px #ae3f5840}.n7 .string{height:190px;width:1px;background:#777;left:50%;top:100%}
-/* 8 纸飞机：放飞 */
-.n8{--bg:#ecd6a9;--ink:#594b3d;background:linear-gradient(140deg,#f8ebce,#d9b892)}.n8 .art{border:10px solid #f8f0df;box-shadow:0 10px 35px #85644333;background:repeating-linear-gradient(0deg,transparent 0 32px,#987b4c22 33px 34px)}.n8 .postmark{border:2px solid #a9614c;border-radius:50%;width:110px;height:110px;right:8%;top:7%;text-align:center;padding-top:16px;line-height:1.3;font:12px Georgia;color:#a9614c;transform:rotate(12deg)}.n8 .plane{font-size:180px;color:#bc5d4b;left:25%;top:28%;transition:transform 1.6s,opacity 1.6s}.n8.active .plane{transform:translate(380px,-250px) rotate(-15deg);opacity:0}.n8 .trail{left:10%;bottom:20%;width:42%;height:20%;border-bottom:2px dashed #b78b74;border-radius:50%}
-/* 9 灯塔：点亮 */
-.n9{--bg:#111c35;--ink:#e8edf4;background:linear-gradient(#10192f,#284567 65%,#173749 66%)}.n9 .moon{right:12%;top:4%;font-size:110px;color:#f8df9f}.n9 .lighthouse{left:35%;top:22%;width:40%;height:70%}.n9 .lamp{left:34%;top:0;width:32%;height:19%;background:#64738a;border:8px solid #d3e1e1;border-radius:12px;transition:background .6s,box-shadow .6s}.n9.active .lamp{background:#ffecaa;box-shadow:0 0 65px 25px #f8df8c88}.n9 .tower{left:23%;top:18%;width:54%;height:70%;background:repeating-linear-gradient(#e7e8dc 0 45px,#d87061 45px 75px);clip-path:polygon(22% 0,78% 0,100% 100%,0 100%)}.n9 .island{bottom:0;width:100%;height:15%;border-radius:50%;background:#172d39}.n9 .beam{left:0;top:20%;width:52%;height:35%;background:linear-gradient(90deg,transparent,#ffefb25c);clip-path:polygon(0 0,100% 45%,100% 55%,0 100%);opacity:0;transition:opacity 1s}.n9.active .beam{opacity:1}.n9 .switch{right:8%;bottom:15%;width:60px;height:60px;border:3px solid #e6dfc3;border-radius:50%;text-align:center;line-height:52px;font-size:30px}
-/* 10 电台：播放 */
-.n10{--bg:#b5a8d2;--ink:#343052;background:linear-gradient(135deg,#ded3e8,#a59ac8)}.n10 .radio{left:10%;top:28%;width:80%;height:46%;border:9px solid #554e69;border-radius:25px;background:#f4dfc5;box-shadow:12px 18px 0 #665b8066}.n10 .radio-top{left:8%;top:10%;width:84%;height:19%;background:#6b6479;border-radius:7px;color:#f7e8ca;padding:8px;font:12px monospace;letter-spacing:.1em}.n10 .dial{left:10%;top:40%;font-size:60px;color:#b66671}.n10 .speaker{right:10%;top:40%;font:30px/18px monospace;letter-spacing:5px;color:#8a7780}.n10 .play-button{position:absolute;left:43%;bottom:10%;border:0;border-radius:50%;width:52px;height:52px;background:#ce747a;color:white;cursor:pointer}.n10.active .dial{animation:spin 2s linear infinite}.n10.active .play-button{background:#7eae9b}
-@keyframes rise{from{transform:translateY(30px) scale(.6);opacity:0}to{transform:none;opacity:1}}@keyframes spin{to{transform:rotate(360deg)}}@keyframes swim{to{transform:translateX(70px)}}
-@media(max-width:700px){.intro .copy{left:8%;top:auto;bottom:7%;width:84%;transform:none;text-align:center}.intro h1{margin:12px 0;font-size:30px}.intro p{margin:10px auto;font-size:14px}.intro .hint{margin-top:18px}.intro .art{width:78vw;height:48vh;top:10%;left:11%;right:auto;transform:none}.i-bar{right:12px;top:12px}.n3 .rocket{font-size:100px}.n8 .plane{font-size:120px}.n9 .moon{font-size:70px}.n7 .balloon{width:105px;height:130px;padding-top:36px;font-size:40px}.n6 .needle{font-size:95px}.n10 .radio-top{font-size:9px}.n4 .mirror{height:90%}}
-@media(prefers-reduced-motion:reduce){.intro *, .intro *:before,.intro *:after{animation:none!important;transition:none!important}}
-/* 各场景采用不同的画面构图。 */
-@media(min-width:701px){
-.n2 .copy{left:8%;top:30%;transform:none;width:35%}.n2 .art{right:8%;top:55%}
-.n3 .copy{left:7%;top:auto;bottom:11%;transform:none}.n3 .art{right:4%;top:45%}
-.n4 .copy{left:auto;right:7%;text-align:right}.n4 .copy p{margin-left:auto}.n4 .art{right:auto;left:5%}
-.n5 .copy{left:8%;top:18%;transform:none}.n5 .art{top:60%;right:10%}
-.n6 .copy{left:auto;right:9%;text-align:right}.n6 .copy p{margin-left:auto}.n6 .art{right:auto;left:5%}
-.n7 .copy{top:auto;bottom:12%;transform:none}.n7 .art{top:42%}
-.n8 .copy{top:21%;left:8%;transform:none}.n8 .art{right:6%;top:56%}
-.n9 .copy{left:auto;right:7%;text-align:right}.n9 .copy p{margin-left:auto}.n9 .art{left:6%;right:auto}
-.n10 .copy{top:18%;transform:none}.n10 .art{top:57%}
+/* ============================================================
+   开场片头 · 10 个场景（Second cut）
+   ------------------------------------------------------------
+   这一版的原则：不是「同一个版式换背景」，而是 10 个不同的画面。
+
+    1 信纸    一张斜放的信，钢笔字逐行出现
+    2 日历    撕页日历，大号日期，撕下来才看到问候
+    3 唱片    黑胶唱片，唱针落下才转
+    4 车窗    雨夜车窗，雾气遮住字，要用手擦
+    5 桌面    俯拍木桌 + 咖啡 + 便签
+    6 星图    星座连线拼出名字，鼠标带动星空视差
+    7 窗光    清晨窗边的剪影，阳光照进来
+    8 折纸    撞色几何 + 纸鹤飞过
+    9 灯泡    暗房里一盏灯，点一下才亮
+   10 磁带    一盘老磁带，按下播放键才转
+
+   每个场景的构图、配色、字体感、交互都不一样。
+   情话写在每个场景自己的位置，不作为统一副标题。
+   ============================================================ */
+
+.intro{
+  position:fixed;inset:0;z-index:999;overflow:hidden;user-select:none;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .85s cubic-bezier(.32,.72,0,1), transform .85s cubic-bezier(.32,.72,0,1);
+}
+.intro.out{opacity:0;transform:scale(1.015);pointer-events:none}
+.intro.still *{transition:none!important;animation:none!important}
+.intro.stage-wrap > .stage{
+  position:absolute;inset:0;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+
+/* 通用 */
+.k{font-family:"Kaiti SC","STKaiti","KaiTi","楷体","Songti SC","SimSun",serif}
+.sans{font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.hand{font-family:"Kaiti SC","STKaiti","KaiTi","楷体",cursive}
+.fade{opacity:0;transition:opacity 1s cubic-bezier(.32,.72,0,1)}
+.fade.in{opacity:1}
+.up{opacity:0;transform:translateY(10px);
+  transition:opacity 1s cubic-bezier(.32,.72,0,1),transform 1s cubic-bezier(.32,.72,0,1)}
+.up.in{opacity:1;transform:none}
+
+/* 顶部工具条 */
+.i-bar{position:absolute;top:15px;right:17px;z-index:20;display:flex;gap:8px}
+.i-bar button{
+  font-size:11px;letter-spacing:.05em;padding:5px 11px;border-radius:999px;cursor:pointer;
+  background:rgba(255,255,255,.06);border:1px solid currentColor;color:inherit;
+  opacity:.55;transition:opacity .2s;backdrop-filter:blur(6px);
+}
+.i-bar button:hover{opacity:1}
+.i-tag{position:absolute;left:17px;bottom:15px;z-index:20;font-size:10px;
+  letter-spacing:.15em;opacity:.42;font-variant-numeric:tabular-nums}
+
+/* ══════════════════════════════════════════════════════════════
+   1 · 信纸  —  一张斜放的信，钢笔字逐行出现
+   交互：向下滚动 / 拖动，把信往下抽出来
+   ══════════════════════════════════════════════════════════════ */
+.intro[data-scene="1"]{
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%,#f7f0e4 0%,#eee4d5 45%,#e4d8c6 100%);
+  color:#3a3128;
+}
+.s1 .paper{
+  position:relative;width:min(520px,86vw);padding:52px 46px 44px;
+  background:linear-gradient(178deg,#fffdf8,#fdfaf2);
+  border-radius:3px;transform:rotate(-1.4deg);
+  box-shadow:0 1px 2px rgba(90,70,45,.09),0 18px 46px -12px rgba(90,70,45,.28),
+             0 46px 90px -30px rgba(90,70,45,.22);
+  transition:transform .9s cubic-bezier(.32,.72,0,1);
+}
+/* 信纸横格线 */
+.s1 .paper::before{
+  content:'';position:absolute;inset:44px 40px 40px;pointer-events:none;
+  background:repeating-linear-gradient(180deg,
+    transparent 0 33px,rgba(120,100,72,.13) 33px 34px);
+  opacity:.8;
+}
+/* 左侧红线 */
+.s1 .paper::after{
+  content:'';position:absolute;top:0;bottom:0;left:34px;width:1px;
+  background:rgba(196,96,96,.26);
+}
+.s1 .stamp{
+  position:absolute;top:20px;right:22px;width:46px;height:56px;border-radius:2px;
+  background:linear-gradient(140deg,#e8b7c4,#d98da4);
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.5);
+  display:grid;place-items:center;color:#fff;font-size:15px;opacity:.9;
+  transform:rotate(6deg);
+}
+.s1 .line{position:relative;opacity:0;transform:translateY(6px);
+  transition:opacity .85s cubic-bezier(.32,.72,0,1),transform .85s cubic-bezier(.32,.72,0,1)}
+.s1 .line.in{opacity:1;transform:none}
+.s1 .salut{font-size:15px;letter-spacing:.1em;color:#6b5b48;margin-bottom:24px}
+.s1 .who{
+  font-family:"Kaiti SC","STKaiti","KaiTi","楷体",serif;
+  font-size:clamp(38px,6.4vw,54px);line-height:1.3;letter-spacing:.06em;
+  color:#2e2620;margin:0 0 6px;
+}
+.s1 .say{font-size:14px;line-height:2.1;letter-spacing:.08em;color:#5d5040;margin:18px 0 0}
+.s1 .love{
+  margin-top:26px;font-size:15.5px;letter-spacing:.1em;color:#b0637a;
+  font-family:"Kaiti SC","STKaiti","KaiTi","楷体",serif;
+}
+.s1 .sign{margin-top:30px;text-align:right;font-size:13px;color:#7a6a56;letter-spacing:.1em}
+.s1 .pull{
+  position:absolute;bottom:6%;left:50%;transform:translateX(-50%);
+  font-size:11px;letter-spacing:.28em;color:#9c8b74;transition:opacity .5s;
+}
+.s1 .tear{position:absolute;inset:0;background:rgba(240,232,218,.92)}
+
+/* ══════════════════════════════════════════════════════════════
+   2 · 日历  —  撕页日历
+   交互：点一下把这一页撕下来，背后是问候
+   ══════════════════════════════════════════════════════════════ */
+.intro[data-scene="2"]{
+  background:#f3f1ec;color:#1d1d1f;
+  background-image:radial-gradient(circle at 50% 120%,#e9e5dc,transparent 60%);
+}
+.s2 .cal{
+  position:relative;width:min(360px,78vw);
+  background:#fff;border-radius:10px;overflow:hidden;
+  box-shadow:0 2px 4px rgba(0,0,0,.06),0 24px 60px -18px rgba(0,0,0,.28);
+}
+.s2 .ring{
+  position:absolute;top:-9px;left:0;right:0;display:flex;justify-content:center;gap:34px;z-index:5;
+}
+.s2 .ring i{width:9px;height:20px;border-radius:5px;
+  background:linear-gradient(180deg,#c9ccd2,#9aa0a9);box-shadow:0 2px 4px rgba(0,0,0,.25)}
+.s2 .month{
+  background:#d94a4a;color:#fff;font-size:13px;letter-spacing:.3em;
+  padding:14px 0 12px;text-align:center;font-weight:600;
+}
+.s2 .body{padding:26px 20px 30px;text-align:center;position:relative}
+.s2 .day{
+  font-size:clamp(76px,15vw,116px);line-height:.92;font-weight:200;letter-spacing:-.04em;
+  font-variant-numeric:tabular-nums;color:#1d1d1f;
+}
+.s2 .wd{font-size:12px;letter-spacing:.4em;color:#8a8a8e;margin-top:10px}
+.s2 .divider{height:1px;background:#ececee;margin:20px 14px}
+.s2 .who{font-size:19px;font-weight:600;letter-spacing:.06em}
+.s2 .love{font-size:12.5px;color:#a08090;letter-spacing:.16em;margin-top:9px}
+.s2 .back{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:30px;text-align:center;
+  background:#fff;opacity:0;transition:opacity .6s ease;
+}
+.s2.revealed .back{opacity:1}
+.s2 .back .who{font-size:clamp(30px,5.4vw,42px);font-weight:300;letter-spacing:.12em;
+  font-family:"Kaiti SC","STKaiti","KaiTi","楷体",serif}
+.s2 .back .say{font-size:13.5px;color:#8a8a8e;letter-spacing:.18em;margin-top:16px;line-height:2}
+.s2 .flap{
+  position:absolute;inset:0;background:#fff;z-index:4;transform-origin:top center;
+  transition:transform 1s cubic-bezier(.55,0,.35,1),opacity .9s ease .45s;
+  box-shadow:0 2px 6px rgba(0,0,0,.08);
+}
+.s2.revealed .flap{transform:rotateX(-118deg) translateY(-12px);opacity:0}
+.s2 .hint{position:absolute;bottom:8%;left:0;right:0;text-align:center;
+  font-size:11px;letter-spacing:.3em;color:#a8a8ad;transition:opacity .4s}
+.s2.revealed .hint{opacity:0}
+
+/* ══════════════════════════════════════════════════════════════
+   3 · 唱片  —  黑胶 + 唱针
+   交互：点唱臂，唱针落下，唱片开始转
+   ══════════════════════════════════════════════════════════════ */
+.intro[data-scene="3"]{
+  background:radial-gradient(ellipse 90% 80% at 50% 45%,#1b1512 0%,#0e0a09 60%,#070505 100%);
+  color:#f0e2c8;
+}
+.s3 .deck{position:relative;width:min(430px,80vw);aspect-ratio:1}
+.s3 .vinyl{
+  position:absolute;inset:0;border-radius:50%;
+  background:
+    repeating-radial-gradient(circle at 50% 50%,
+      rgba(255,255,255,.045) 0 1px, transparent 1px 4px),
+    radial-gradient(circle at 42% 34%,#2a2422 0%,#141010 42%,#0b0808 100%);
+  box-shadow:0 0 0 1px rgba(255,255,255,.06),0 30px 70px -20px rgba(0,0,0,.9),
+             inset 0 0 60px rgba(0,0,0,.8);
+  display:grid;place-items:center;
+}
+.s3 .vinyl::after{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  background:conic-gradient(from 20deg,transparent 0 42deg,rgba(255,255,255,.05) 46deg,
+    transparent 52deg 180deg,rgba(255,255,255,.04) 186deg,transparent 192deg);
+  pointer-events:none;
+}
+.s3.spin .vinyl{animation:s3-spin 7s linear infinite}
+@keyframes s3-spin{to{transform:rotate(360deg)}}
+.s3 .label{
+  position:relative;width:44%;aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle at 38% 32%,#e8c07a,#c9974a 55%,#a5782f 100%);
+  display:grid;place-items:center;text-align:center;
+  box-shadow:inset 0 0 20px rgba(90,60,20,.5);
+}
+.s3 .label::after{content:'';position:absolute;width:7px;height:7px;border-radius:50%;
+  background:#0b0808;box-shadow:0 0 0 2px rgba(0,0,0,.35)}
+.s3 .label .txt{transform:rotate(0)}
+.s3 .who{
+  font-size:clamp(17px,2.6vw,23px);letter-spacing:.14em;color:#2a1c0c;font-weight:600;
+  font-family:"Kaiti SC","STKaiti","KaiTi","楷体",serif;
+}
+.s3 .love{font-size:10px;letter-spacing:.26em;color:rgba(42,28,12,.62);margin-top:7px}
+.s3 .arm{
+  position:absolute;top:6%;right:-6%;width:52%;height:8px;border-radius:4px;
+  background:linear-gradient(90deg,#8e939a,#d7dbe0 40%,#9aa0a7);
+  transform-origin:100% 50%;transform:rotate(-26deg);
+  transition:transform 1.15s cubic-bezier(.55,0,.35,1);
+  box-shadow:0 3px 8px rgba(0,0,0,.6);cursor:pointer;
+}
+.s3 .arm::before{
+  content:'';position:absolute;right:-13px;top:-9px;width:30px;height:26px;border-radius:6px;
+  background:linear-gradient(160deg,#c8ced5,#878e96);
+}
+.s3 .arm::after{
+  content:'';position:absolute;left:-9px;top:-3px;width:16px;height:14px;border-radius:3px;
+  background:#b9c0c7;
+}
+.s3.spin .arm{transform:rotate(4deg)}
+.s3 .side{
+  margin-top:34px;text-align:center;
+}
+.s3 .side .say{font-size:12px;letter-spacing:.24em;color:rgba(240,226,200,.5)}
+.s3 .side .who2{font-size:15px;letter-spacing:.2em;margin-top:10px;color:rgba(240,226,200,.86)}
+.s3 .hint{position:absolute;bottom:7%;left:0;right:0;text-align:center;
+  font-size:11px;letter-spacing:.3em;color:rgba(240,226,200,.4);transition:opacity .5s}
+.s3.spin .hint{opacity:0}
+
+/* ══════════════════════════════════════════════════════════════
+   4 · 车窗  —  雨夜，雾气写字
+   交互：用鼠标/手指在玻璃上擦，擦开的地方能看见字
+   ══════════════════════════════════════════════════════════════ */
+.intro[data-scene="4"]{
+  background:#070d16;color:#e8f0fa;
+}
+.s4 .bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 22% 68%,rgba(255,190,120,.30) 0 5%,transparent 22%),
+    radial-gradient(circle at 74% 58%,rgba(120,180,255,.24) 0 4%,transparent 20%),
+    radial-gradient(circle at 48% 76%,rgba(255,120,160,.18) 0 3%,transparent 16%),
+    radial-gradient(circle at 88% 72%,rgba(120,255,200,.14) 0 3%,transparent 15%),
+    linear-gradient(180deg,#0a1424 0%,#0a1220 40%,#071018 100%);
+  filter:blur(12px);
+}
+.s4 .glass{
+  position:absolute;inset:0;z-index:2;
+  background:linear-gradient(175deg,rgba(190,215,240,.16),rgba(150,180,215,.07) 45%,rgba(190,215,240,.12));
+  backdrop-filter:blur(2px);
+}
+/* 雾气层：被鼠标擦掉的位置透出字 */
+.s4 .fog{
+  position:absolute;inset:0;z-index:4;
+  background:
+    linear-gradient(180deg,rgba(232,240,250,.20),rgba(232,240,250,.13));
+  -webkit-mask-image:radial-gradient(circle at var(--mx,50%) var(--my,50%),
+    transparent 0,transparent var(--r,0px),#000 calc(var(--r,0px) + 70px));
+  mask-image:radial-gradient(circle at var(--mx,50%) var(--my,50%),
+    transparent 0,transparent var(--r,0px),#000 calc(var(--r,0px) + 70px));
+  transition:mask-image .1s linear;
+}
+.s4 .drops{position:absolute;inset:0;z-index:3;overflow:hidden;pointer-events:none}
+.s4 .drops i{
+  position:absolute;top:-20%;width:1.5px;border-radius:1px;
+  background:linear-gradient(180deg,transparent,rgba(220,235,250,.7),transparent);
+  animation:s4-fall linear infinite;
+}
+@keyframes s4-fall{to{transform:translateY(130vh)}}
+.s4 .msg{
+  position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;padding:0 30px;
+}
+.s4 .who{
+  font-size:clamp(34px,6vw,58px);letter-spacing:.14em;font-weight:300;
+  font-family:"Kaiti SC","STKaiti","KaiTi","楷体",serif;
+  text-shadow:0 0 40px rgba(160,200,255,.35);
+}
+.s4 .love{font-size:13px;letter-spacing:.24em;color:rgba(200,220,245,.62);margin-top:26px}
+.s4 .say{font-size:11.5px;letter-spacing:.28em;color:rgba(200,220,245,.4);margin-top:14px}
+.s4 .hint{position:absolute;bottom:8%;left:0;right:0;z-index:5;text-align:center;
+  font-size:11px;letter-spacing:.3em;color:rgba(200,220,245,.45);transition:opacity .6s}
+.s4.revealed .hint{opacity:0}
+/* ══════════════════════════════════════════════════════════════
+   5 · 绿植  —  窗台上的一盆植物，浇水会长出新叶
+   交互：点一下浇水，新叶子长出来
+   ══════════════════════════════════════════════════════════════ */
+.intro[data-scene="5"]{
+  background:
+    radial-gradient(ellipse 90% 60% at 50% 0%,#f2f6ee 0%,#e4ebdf 50%,#d5e0d1 100%);
+  color:#2f3a2c;
+}
+.s5 .scene{
+  position:relative;width:min(440px,88vw);height:min(500px,74vh);
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  padding-bottom:30px;
+}
+/* 光斑 */
+.s5 .sun{
+  position:absolute;top:2%;right:6%;width:44%;aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,244,214,.85),rgba(255,240,200,.25) 45%,transparent 68%);
+  filter:blur(18px);pointer-events:none;
+}
+/* 植物 */
+.s5 .plant{position:relative;width:100%;height:64%;margin-bottom:-6px}
+.s5 .stem{
+  position:absolute;left:50%;bottom:0;width:3px;border-radius:2px;
+  background:linear-gradient(180deg,#6d9a5f,#3d5f3a);
+  transform-origin:bottom center;transform:translateX(-50%);
+}
+.s5 .leaf{
+  position:absolute;width:70px;height:38px;
+  border-radius:100% 0 100% 0;
+  background:linear-gradient(135deg,#86b573 0%,#5d8a52 55%,#3f6440 100%);
+  box-shadow:inset 2px 2px 6px rgba(255,255,255,.22),inset -2px -3px 8px rgba(30,60,30,.28);
+  transform-origin:0 100%;
+  opacity:0;scale:.4;
+  transition:opacity .7s cubic-bezier(.34,1.4,.64,1),scale .7s cubic-bezier(.34,1.4,.64,1);
+}
+.s5 .leaf.in{opacity:1;scale:1}
+.s5 .leaf.mirror{border-radius:0 100% 0 100%;transform-origin:100% 100%}
+/* 花盆 */
+.s5 .pot{
+  position:relative;width:44%;height:22%;min-height:92px;
+  clip-path:polygon(6% 0,94% 0,84% 100%,16% 100%);
+  background:linear-gradient(100deg,#c98f66 0%,#b87752 45%,#a46544 100%);
+  box-shadow:inset -10px 0 18px rgba(90,50,30,.35),inset 12px 0 16px rgba(255,220,190,.18);
+}
+.s5 .pot::after{
+  content:'';position:absolute;left:0;right:0;top:0;height:12%;
+  background:linear-gradient(180deg,#d9a179,#c1875e);
+}
+/* 盆上的小牌子 */
+.s5 .tag{
+  position:absolute;left:50%;top:16%;transform:translateX(-50%) rotate(-2deg);
+  background:linear-gradient(170deg,#fffdf6,#f3ecdb);
+  border-radius:3px;padding:9px 15px 8px;text-align:center;
+  box-shadow:0 2px 5px rgba(70,50,30,.28);
+  border-left:3px solid #7fa06e;
+}
+.s5 .tag .who{
+  font-family:"Kaiti SC","STKaiti","KaiTi","楷体",serif;
+  font-size:15px;letter-spacing:.1em;color:#3a4a34;line-height:1.2;
+}
+.s5 .tag .love{font-size:9.5px;letter-spacing:.14em;color:#8a9a7e;margin-top:4px}
+.s5 .water{
+  position:absolute;left:50%;top:-14%;transform:translateX(-50%);
+  width:2px;height:16px;border-radius:2px;
+  background:linear-gradient(180deg,rgba(120,180,220,0),rgba(120,180,220,.9));
+  opacity:0;pointer-events:none;
+}
+.s5.watering .water{animation:s5-fall 1.1s ease-in forwards}
+@keyframes s5-fall{
+  0%{opacity:1;top:-14%;height:16px}
+  100%{opacity:0;top:56%;height:44px}
+}
+.s5 .hint{position:absolute;bottom:-26px;left:0;right:0;text-align:center;
+  font-size:11px;letter-spacing:.28em;color:rgba(60,75,55,.45);transition:opacity .5s}
+.s5.watering .hint{opacity:0}
+
+/* ══════════════════════════════════════════════════════════════
+   6 · 沙漏  —  时间和沙
+   交互：点一下翻转沙漏，沙子重新开始流
+   ══════════════════════════════════════════════════════════════ */
+.intro[data-scene="6"]{
+  background:radial-gradient(ellipse 85% 72% at 50% 42%,#2a2218 0%,#17120c 55%,#0c0906 100%);
+  color:#f2e6cc;
+}
+.s6 .hour{
+  position:relative;width:min(240px,52vw);height:min(400px,62vh);
+  transition:transform 1.1s cubic-bezier(.55,0,.35,1);
+}
+.s6.flip .hour{transform:rotate(180deg)}
+/* 木头上下盖 */
+.s6 .cap{
+  position:absolute;left:6%;right:6%;height:9%;border-radius:4px;
+  background:linear-gradient(180deg,#8a6540,#5c3f26 60%,#432c19);
+  box-shadow:0 3px 8px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,220,180,.25);
+}
+.s6 .cap.t{top:0}
+.s6 .cap.b{bottom:0}
+/* 三根柱子 */
+.s6 .post{position:absolute;width:7px;top:9%;bottom:9%;
+  background:linear-gradient(90deg,#4a3320,#8a6540 40%,#5c3f26);
+  border-radius:3px;box-shadow:0 0 8px rgba(0,0,0,.5)}
+.s6 .post.l{left:6%}
+.s6 .post.r{right:6%}
+/* 玻璃与沙 */
+.s6 .glass{
+  position:absolute;left:18%;right:18%;top:9%;bottom:9%;
+}
+.s6 .chamber{
+  position:absolute;left:0;right:0;height:43%;
+  background:linear-gradient(180deg,rgba(255,245,225,.10),rgba(255,245,225,.04));
+  border:1px solid rgba(255,240,210,.22);
+}
+.s6 .chamber.top{top:0;clip-path:polygon(0 0,100% 0,52% 100%,48% 100%)}
+.s6 .chamber.bot{bottom:0;clip-path:polygon(48% 0,52% 0,100% 100%,0 100%)}
+.s6 .sandTop,.s6 .sandBot{
+  position:absolute;left:0;right:0;
+  background:linear-gradient(180deg,#e8c68a,#c99a4f);
+  filter:blur(.4px);
+}
+.s6 .sandTop{top:0;height:88%;clip-path:polygon(0 0,100% 0,52% 100%,48% 100%);
+  transition:height 6s linear}
+.s6 .sandBot{bottom:0;height:4%;clip-path:polygon(48% 0,52% 0,100% 100%,0 100%);
+  transition:height 6s linear}
+.s6.running .sandTop{height:6%}
+.s6.running .sandBot{height:86%}
+/* 中间的细流 */
+.s6 .stream{
+  position:absolute;left:50%;top:43%;width:1.5px;height:14%;
+  transform:translateX(-50%);background:linear-gradient(180deg,#e8c68a,#c99a4f);
+  opacity:0;transition:opacity .3s;
+}
+.s6.running .stream{opacity:1}
+.s6 .txt{
+  position:relative;z-index:3;text-align:center;margin-top:34px;
+}
+.s6 .who{
+  font-family:"Kaiti SC","STKaiti","KaiTi","楷体",serif;
+  font-size:clamp(26px,4.4vw,38px);letter-spacing:.18em;color:#f7eeda;
+}
+.s6 .love{font-size:12.5px;letter-spacing:.22em;color:rgba(242,230,204,.5);margin-top:14px}
+.s6 .sub{font-size:11px;letter-spacing:.26em;color:rgba(242,230,204,.32);margin-top:10px}
+.s6 .hint{position:absolute;bottom:7%;left:0;right:0;text-align:center;
+  font-size:11px;letter-spacing:.3em;color:rgba(242,230,204,.38);transition:opacity .5s}
+.s6.running .hint{opacity:0}
+
+/* ══════════════════════════════════════════════════════════════
+   7 · 风筝  —  晴天的风筝和一根线
+   交互：鼠标移动，风筝跟着飘
+   ══════════════════════════════════════════════════════════════ */
+.intro[data-scene="7"]{
+  background:linear-gradient(178deg,#9fcfee 0%,#bcdff3 38%,#e8ebe4 66%,#f8ddc0 100%);
+  color:#243747;
+}
+.s7 .cloud{
+  position:absolute;border-radius:50%;filter:blur(16px);pointer-events:none;
+  background:rgba(255,255,255,.72);
+}
+.s7 .wrap{position:relative;width:min(700px,94vw);height:min(560px,80vh)}
+.s7 .kite{
+  position:absolute;left:50%;top:26%;width:min(150px,26vw);aspect-ratio:.86;
+  transform:translate(-50%,-50%);
+  transition:transform .9s cubic-bezier(.32,.72,0,1);
+  cursor:pointer;z-index:3;
+}
+.s7 .kite svg{width:100%;height:100%;overflow:visible;
+  filter:drop-shadow(0 16px 22px rgba(80,100,130,.26))}
+.s7 .line{
+  position:absolute;inset:0;z-index:2;pointer-events:none;
+}
+.s7 .line svg{width:100%;height:100%;overflow:visible}
+.s7 .line path{fill:none;stroke:rgba(60,80,100,.42);stroke-width:1.2;
+  stroke-dasharray:4 4}
+.s7 .msg{
+  position:absolute;left:0;right:0;bottom:2%;text-align:center;z-index:4;
+}
+.s7 .who{
+  font-family:"Kaiti SC","STKaiti","KaiTi","楷体",serif;
+  font-size:clamp(28px,4.8vw,44px);letter-spacing:.16em;color:#22323f;
+  text-shadow:0 2px 18px rgba(255,255,255,.7);
+}
+.s7 .love{font-size:12.5px;letter-spacing:.22em;color:rgba(34,50,63,.6);margin-top:16px}
+.s7 .hint{position:absolute;top:4%;left:0;right:0;text-align:center;
+  font-size:11px;letter-spacing:.3em;color:rgba(34,50,63,.42)}
+
+
+/* ══════════════════════════════════════════════════════════════
+   8 · 折纸  —  撞色几何 + 纸鹤
+   交互：点纸鹤，它飞走，露出问候
+   ══════════════════════════════════════════════════════════════ */
+.intro[data-scene="8"]{
+  background:#fdf8f0;color:#1a1a1a;overflow:hidden;
+}
+.s8 .shard{position:absolute;pointer-events:none}
+.s8 .shard.a{top:-8%;left:-6%;width:46%;height:52%;
+  background:linear-gradient(150deg,#ff8a5c,#f2622e);
+  clip-path:polygon(0 0,100% 0,22% 100%)}
+.s8 .shard.b{bottom:-10%;right:-4%;width:44%;height:48%;
+  background:linear-gradient(210deg,#3f6bd6,#25459c);
+  clip-path:polygon(100% 100%,100% 0,0 100%)}
+.s8 .shard.c{top:14%;right:8%;width:22%;height:26%;
+  background:linear-gradient(200deg,#ffd166,#f4b93e);
+  clip-path:polygon(50% 0,100% 100%,0 100%)}
+.s8 .shard.d{bottom:16%;left:6%;width:18%;height:22%;
+  background:linear-gradient(160deg,#57c7a4,#2f9c7c);
+  clip-path:polygon(0 0,100% 42%,18% 100%)}
+.s8 .crane{
+  position:absolute;left:50%;top:50%;z-index:4;width:120px;height:120px;
+  transform:translate(-50%,-50%);cursor:pointer;
+  transition:transform 1.5s cubic-bezier(.45,0,.25,1),opacity 1.2s ease;
+  filter:drop-shadow(0 18px 26px rgba(120,80,50,.28));
+}
+.s8 .crane svg{width:100%;height:100%}
+.s8.flew .crane{transform:translate(60vw,-70vh) rotate(28deg) scale(.5);opacity:0}
+.s8 .msg{position:relative;z-index:3;text-align:center;opacity:0;transform:scale(.96);
+  transition:opacity .9s ease .25s,transform .9s cubic-bezier(.32,.72,0,1) .25s}
+.s8.flew .msg{opacity:1;transform:none}
+.s8 .who{
+  font-size:clamp(38px,6.8vw,66px);letter-spacing:.02em;font-weight:800;color:#161616;
+  line-height:1.1;
+}
+.s8 .love{margin-top:24px;font-size:13px;letter-spacing:.2em;color:#7a6a5c;font-weight:500}
+.s8 .say{margin-top:12px;font-size:11.5px;letter-spacing:.26em;color:#a89a8c}
+.s8 .hint{position:absolute;bottom:7%;left:0;right:0;z-index:5;text-align:center;
+  font-size:11px;letter-spacing:.3em;color:#a89a8c;transition:opacity .5s}
+.s8.flew .hint{opacity:0}
+
+/* ══════════════════════════════════════════════════════════════
+   9 · 灯泡  —  暗房 + 一盏灯
+   交互：点灯泡开关，可以反复
+   ══════════════════════════════════════════════════════════════ */
+.intro[data-scene="9"]{
+  background:#050506;color:#ffe9c2;
+}
+.s9 .bulb{
+  position:relative;z-index:3;width:min(150px,26vw);cursor:pointer;
+}
+.s9 .glass{
+  position:relative;width:100%;aspect-ratio:1/1.06;
+  border-radius:50% 50% 46% 46%;
+  background:radial-gradient(circle at 38% 32%,rgba(255,235,190,.14),rgba(255,220,160,.05) 55%,transparent 72%);
+  border:1.5px solid rgba(255,235,190,.20);
+  transition:background .5s,box-shadow .7s,border-color .5s;
+}
+.s9 .filament{
+  position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);
+  width:44%;height:26%;border-top:1.5px solid rgba(255,220,160,.28);
+  border-radius:50% 50% 0 0;transition:border-color .5s,box-shadow .7s;
+}
+.s9 .filament::before,.s9 .filament::after{
+  content:'';position:absolute;top:-2px;width:1.5px;height:26px;
+  background:rgba(255,220,160,.28);transition:background .5s;
+}
+.s9 .filament::before{left:0}
+.s9 .filament::after{right:0}
+.s9 .base{
+  width:44%;height:16%;margin:-4px auto 0;border-radius:2px 2px 6px 6px;
+  background:linear-gradient(180deg,#8d8a86,#5c5a57 40%,#3d3b39);
+  box-shadow:inset 0 1px 2px rgba(255,255,255,.2);
+}
+.s9 .glow{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(1100px,150vw);aspect-ratio:1;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,rgba(255,206,120,.34) 0%,rgba(255,180,90,.10) 26%,transparent 58%);
+  opacity:0;transition:opacity .8s ease;z-index:1;
+}
+.s9.on .glass{
+  background:radial-gradient(circle at 38% 32%,rgba(255,248,225,.98),rgba(255,226,170,.92) 55%,rgba(255,205,130,.75) 78%);
+  box-shadow:0 0 60px 18px rgba(255,205,130,.6),0 0 160px 70px rgba(255,180,90,.28),inset 0 0 30px rgba(255,255,255,.9);
+  border-color:rgba(255,248,225,.9);
+}
+.s9.on .filament{border-color:#fff6dc;box-shadow:0 0 12px rgba(255,240,200,.9)}
+.s9.on .filament::before,.s9.on .filament::after{background:#fff6dc}
+.s9.on .glow{opacity:1}
+.s9 .msg{position:relative;z-index:4;text-align:center;margin-top:38px}
+.s9 .who{
+  font-family:"Kaiti SC","STKaiti","KaiTi","楷体",serif;
+  font-size:clamp(28px,5vw,46px);letter-spacing:.16em;
+  color:rgba(255,233,194,.16);transition:color .8s ease;
+}
+.s9.on .who{color:#fff2d6}
+.s9 .love{margin-top:16px;font-size:12.5px;letter-spacing:.24em;
+  color:rgba(255,233,194,.14);transition:color .8s ease .1s}
+.s9.on .love{color:rgba(255,233,194,.62)}
+.s9 .hint{position:absolute;bottom:8%;left:0;right:0;z-index:3;text-align:center;
+  font-size:11px;letter-spacing:.3em;color:rgba(255,233,194,.34)}
+.s9 .switch{
+  position:absolute;left:50%;bottom:13%;transform:translateX(-50%);
+  width:1px;height:26%;background:linear-gradient(180deg,rgba(255,235,190,.25),transparent);
+  z-index:2;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   10 · 磁带  —  一盘老磁带
+   交互：点播放键，齿轮转起来
+   ══════════════════════════════════════════════════════════════ */
+.intro[data-scene="10"]{
+  background:
+    radial-gradient(ellipse 80% 70% at 50% 40%,#3a2b1e 0%,#241a12 55%,#150f0a 100%);
+  color:#f3e6ce;
+}
+.s10 .tape{
+  position:relative;width:min(440px,86vw);aspect-ratio:1.6;
+  border-radius:9px;
+  background:linear-gradient(165deg,#2b2b30,#1c1c20 55%,#131316);
+  box-shadow:0 2px 0 rgba(255,255,255,.06) inset,0 26px 60px -16px rgba(0,0,0,.85),
+             0 0 0 1px rgba(255,255,255,.05);
+}
+.s10 .label{
+  position:absolute;inset:7% 6%;border-radius:5px;
+  background:linear-gradient(170deg,#f4e9d2,#e6d7b8 60%,#dcc9a4);
+  overflow:hidden;
+  box-shadow:inset 0 0 0 1px rgba(120,95,55,.24);
+}
+.s10 .label::before{
+  content:'';position:absolute;left:0;right:0;top:0;height:34%;
+  background:linear-gradient(180deg,rgba(200,175,130,.45),rgba(200,175,130,0) 100%);
+}
+.s10 .win{
+  position:absolute;left:7%;right:7%;top:22%;height:40%;
+  border-radius:4px;background:#2a241c;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.4),inset 0 4px 12px rgba(0,0,0,.6);
+  display:flex;align-items:center;justify-content:space-around;padding:0 10%;
+}
+.s10 .reel{
+  width:34%;aspect-ratio:1;border-radius:50%;
+  background:
+    radial-gradient(circle,#f3e6ce 0 16%,transparent 16%),
+    conic-gradient(from 0deg,rgba(255,255,255,.14) 0 20deg,transparent 20deg 45deg,
+      rgba(255,255,255,.14) 45deg 65deg,transparent 65deg 90deg,
+      rgba(255,255,255,.14) 90deg 110deg,transparent 110deg 135deg,
+      rgba(255,255,255,.14) 135deg 155deg,transparent 155deg 180deg,
+      rgba(255,255,255,.14) 180deg 200deg,transparent 200deg 225deg,
+      rgba(255,255,255,.14) 225deg 245deg,transparent 245deg 270deg,
+      rgba(255,255,255,.14) 270deg 290deg,transparent 290deg 315deg,
+      rgba(255,255,255,.14) 315deg 335deg,transparent 335deg 360deg),
+    radial-gradient(circle,rgba(255,255,255,.10),rgba(255,255,255,.02) 70%);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);
+  position:relative;
+}
+.s10 .reel::after{
+  content:'';position:absolute;inset:34%;border-radius:50%;background:#1b1712;
+  box-shadow:0 0 0 2px rgba(255,255,255,.08);
+}
+.s10.playing .reel{animation:s10-spin 2.2s linear infinite}
+.s10.playing .reel.r{animation-direction:reverse}
+@keyframes s10-spin{to{transform:rotate(360deg)}}
+.s10 .who{
+  position:absolute;left:0;right:0;bottom:7%;text-align:center;
+  font-family:"Kaiti SC","STKaiti","KaiTi","楷体",serif;
+  font-size:clamp(16px,2.4vw,21px);letter-spacing:.1em;color:#4a3826;
+}
+.s10 .who small{display:block;font-size:9.5px;letter-spacing:.3em;color:#8c7a60;margin-top:5px;
+  font-family:-apple-system,"Segoe UI",sans-serif}
+.s10 .btnrow{
+  margin-top:30px;display:flex;gap:16px;align-items:center;justify-content:center;
+}
+.s10 .pkey{
+  width:54px;height:38px;border-radius:5px;cursor:pointer;
+  background:linear-gradient(180deg,#3a3a40,#222226);
+  box-shadow:0 3px 0 #121215,0 6px 14px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.14);
+  display:grid;place-items:center;transition:transform .12s,box-shadow .12s;
+}
+.s10 .pkey svg{width:16px;height:16px;fill:#8ee89b;
+  filter:drop-shadow(0 0 6px rgba(142,232,155,.8))}
+.s10 .pkey:active{transform:translateY(3px);box-shadow:0 0 0 #121215,0 2px 6px rgba(0,0,0,.6)}
+.s10 .msg{text-align:center;margin-top:26px;opacity:0;transition:opacity 1.1s ease .3s}
+.s10.playing .msg{opacity:1}
+.s10 .love{font-size:13px;letter-spacing:.22em;color:rgba(243,230,206,.72)}
+.s10 .say{font-size:11px;letter-spacing:.28em;color:rgba(243,230,206,.4);margin-top:11px}
+.s10 .hint{position:absolute;bottom:7%;left:0;right:0;text-align:center;
+  font-size:11px;letter-spacing:.3em;color:rgba(243,230,206,.36);transition:opacity .5s}
+.s10.playing .hint{opacity:0}
+
+@media (max-width:560px){
+  .s1 .paper{padding:38px 26px 32px}
+  .s5 .table{height:auto}
+  .s5 .note{position:relative;right:auto;top:auto;width:100%;margin-top:0}
+  .s5 .cup{position:relative;left:auto;bottom:auto;width:44%;margin:24px auto 0}
+  .s5 .pencil{display:none}
+  .s7 .figure{height:26%}
+  .s10 .tape{aspect-ratio:1.42}
 }
