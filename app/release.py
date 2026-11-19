@@ -7,12 +7,15 @@
 
 VERSION = "1.4.4"
 
+# 本安装专属更新通道；另一个版本使用 no-intro。
+UPDATE_CHANNEL = "with-intro"
+
 APP_NAME = "客户跟进系统"
 
 # 公开仓库：只放代码，不放客户数据
 REPO = "mp7mvdsxtb-bit/customer-followup-system"
 REPO_URL = "https://github.com/" + REPO
-RELEASES_API = "https://api.github.com/repos/%s/releases/latest" % REPO
+RELEASES_API = "https://api.github.com/repos/%s/releases" % REPO
 RELEASES_PAGE = REPO_URL + "/releases"
 
 # 判断新版本时忽略的文件：这些是数据，更新不能覆盖

@@ -200,7 +200,7 @@ function openUpdateDialog() {
         ap.textContent = '正在下载…';
         const p = $('#upd-progress', root);
         p.style.display = '';
-        p.innerHTML = `正在从 GitHub 下载 ${esc(u.latest)} 的安装包，大约 11 MB…`;
+        p.innerHTML = `正在从 GitHub 下载 ${esc(u.latest)} 的安装包…`;
         try {
           const r = await api('/update/apply', { method: 'POST', body: {} });
           if (!r.ok) throw new Error(r.error || '更新失败');
@@ -340,18 +340,16 @@ window.addEventListener('hashchange', () => {
   } catch (e) { console.error(e); }
   if (!location.hash) location.hash = '#/today';
 
-  // 开场片头：每次打开都播（可在设置里关掉，或点「今天不再显示」）
+  // 开场片头：每次进入时播放，可在设置中关闭
   if (introWanted() && S.settings.intro_off !== '1') {
     const q = new URLSearchParams(location.hash.split('?')[1] || '');
-    const iq = q.get('intro');
     playIntro({
+      theme: q.get('it') || S.settings.intro_theme || 'warm',
       name: S.settings.intro_name || '',
       sub: S.settings.intro_sub || '欢迎来到你的客户系统',
       note: S.settings.intro_note || '这里存着你要打的每一通电话',
       sign: S.settings.intro_sign || '',
-      // ?intro=5 强制第 5 个场景；?intro=still&n=5 定格第 5 个用于截图
-      scene: (iq && iq !== 'still' && iq !== '1') ? iq : (q.get('n') || undefined),
-      still: iq === 'still',
+      still: q.get('intro') === 'still',
     });
   }
 
@@ -359,11 +357,21 @@ window.addEventListener('hashchange', () => {
   if (qt.get('cmd') === '1') setTimeout(() => openCommand(), 260);
   // 侧边栏的逾期角标：后台补一次，不阻塞首屏
   api('/stats').then((s) => { S.qualityN = s.overdue; updateNav(); }).catch(() => {});
-  // 开屏 4 秒后悄悄查一次新版本，不打扰
+  // 更新窗口等待开场结束，避免被开场遮住。
+  const showUpdateAfterIntro = () => {
+    if (document.querySelector('.intro')) {
+      document.addEventListener('intro:closed', openUpdateDialog, { once: true });
+    } else {
+      openUpdateDialog();
+    }
+  };
   if (qt.get('update') === '1') {
     await checkUpdate(false);
-    setTimeout(openUpdateDialog, 150);
+    showUpdateAfterIntro();
   } else {
-    setTimeout(() => { checkUpdate(); }, 4000);
+    setTimeout(async () => {
+      const result = await checkUpdate();
+      if (result && result.has_update) showUpdateAfterIntro();
+    }, 4000);
   }
 })();

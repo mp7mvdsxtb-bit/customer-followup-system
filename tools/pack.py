@@ -19,6 +19,20 @@ def version():
         pass
     return "0.0.0"
 
+
+def channel():
+    """更新通道（with-intro / no-intro）。资产名必须带上它，
+    否则 updater 按名字找不到包，更新会静默失败。"""
+    import re
+    try:
+        with open(os.path.join(ROOT, "app", "release.py"), encoding="utf-8") as f:
+            m = re.search(r'UPDATE_CHANNEL\s*=\s*"([^"]+)"', f.read())
+            if m:
+                return m.group(1)
+    except OSError:
+        pass
+    return ""
+
 SKIP_DIRS = {"__pycache__", ".git", "shots", "node_modules", "backups"}
 SKIP_EXT = {".pyc", ".pyo", ".log", ".pdb", ".ilk", ".exp", ".lib"}
 SKIP_NAMES = {"crm.db-wal", "crm.db-shm", "server.log", "start.log", "py.zip"}
@@ -61,7 +75,9 @@ def verify_no_data(path):
 def main():
     stamp = datetime.date.today().strftime("%Y%m%d")
     ver = version()
-    out = os.path.join(OUT_DIR, "customer-followup-system-v%s.zip" % ver)
+    ch = channel()
+    name = ("customer-followup-%s-v%s.zip" % (ch, ver)) if ch else ("customer-followup-system-v%s.zip" % ver)
+    out = os.path.join(OUT_DIR, name)
     if os.path.exists(out):
         os.remove(out)
     n, total = 0, 0
