@@ -111,7 +111,11 @@ def build_today(conn, budget=DEFAULT_BUDGET, tdate=None):
                                       x["next_at"] or "9999"))
 
     picked, used = [], 0
+    # 到期的也要受预算约束：之前这里无条件全塞，165 家到期就排了 662 分钟，
+    # 一小时的 BD 窗口直接失效。至少保留第一条，避免第一条就超预算时队列全空。
     for r in due_rows:
+        if picked and used + r["cost"] > budget:
+            break
         picked.append(r)
         used += r["cost"]
     for r in fill_rows:

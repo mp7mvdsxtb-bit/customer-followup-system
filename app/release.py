@@ -5,7 +5,7 @@
 程序靠 Releases 的 tag 判断有没有新版本。
 """
 
-VERSION = "1.3.1"
+VERSION = "1.4.4"
 
 APP_NAME = "客户跟进系统"
 
